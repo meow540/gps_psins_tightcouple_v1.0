@@ -1,4 +1,4 @@
-yhuuuuu%% GNSS\INS紧组合，不同于GNSS_SDR,本文件下所有通道是交替执行，而不是一个通道运行结束后再运行下一个通道
+%% GNSS\INS紧组合，不同于GNSS_SDR,本文件下所有通道是交替执行，而不是一个通道运行结束后再运行下一个通道
 % trackResults, channel, TOW, eph, subFrameStart 需要提前准备好
 close all;
 
@@ -19,7 +19,7 @@ cleanupObj = onCleanup(@() fclose(fid));
 glvs
 ggpsvars
 psinstypedef('test_SINS_GPS_tightly_def');
-trj = trjfile("E:\fgi_result\ins_simulation\trj_sc522.mat");
+trj = trjfile("E:\fgi_result\ins_simulation\ins3_trj.mat");
 t0_imu = trj.imu(1,end);
 t0_gps = TOW;
 positioningTime = t0_gps + settings.navSolPeriod / 1000;
@@ -29,10 +29,17 @@ davp = avperrset([10;10;60], 0.5, [2; 2; 6]);
 
 ins = insinit(avpadderr(trj.avp0, davp), ts);
 
-imuerr = imuerrset(5,1000,0.05,30);  
+%imuerr = imuerrset(5,1000,0.05,30); 
+%ins1 高精度
+imuerrset(0.01, 100, 0.003, 40);
+%ins2 中精度（常见民用场景）
+
 trj.imu = imuadderr(trj.imu, imuerr);
 
 kf = kfinit(ins, davp, imuerr);
+
+imuLen = size(trj.imu, 1);
+imuEndTime = trj.imu(end, end);
 
 
 %% INS运行至首个紧组合时刻
@@ -41,6 +48,9 @@ k1 = 1;
 t = trj.imu(k1, end);   
 while (t0_gps + (t - t0_imu)) < positioningTime     
     k1 = k+nn-1;
+    if k1 > imuLen
+        error('IMU data exhausted before first GNSS epoch.');
+    end
     wvm = trj.imu(k:k1,1:6);  t = trj.imu(k1,end);
     ins = insupdate(ins, wvm);
     kf.Phikk_1 = kffk(ins);
@@ -151,12 +161,17 @@ end
 
 %% 紧组合
 roundTime = floor(settings.msToProcess / settings.navSolPeriod);
+maxEpochsByImu = floor((imuEndTime - t0_imu) / (settings.navSolPeriod / 1000));
+if roundTime > maxEpochsByImu
+    roundTime = maxEpochsByImu;
+end
 navResults = [];
 navResults.X = zeros(1, roundTime); navResults.Y = zeros(1, roundTime); navResults.Z = zeros(1, roundTime); navResults.dt = zeros(1, roundTime);
 navResults.VX = zeros(1, roundTime); navResults.VY = zeros(1, roundTime); navResults.VZ = zeros(1, roundTime);navResults.df = zeros(1, roundTime);
 
 % settings.pllNoiseBandwidth = 3;
 
+stopEpoch = roundTime;
 for currMeasNr = 1 : roundTime
     currMeasNr
     settings.recvTime = positioningTime;    
@@ -216,6 +231,10 @@ for currMeasNr = 1 : roundTime
     % 6. INS运行至下一次紧组合时刻
     while (t0_gps + (t - t0_imu)) < positioningTime     
         k1 = k+nn-1;
+        if k1 > imuLen
+            stopEpoch = currMeasNr - 1;
+            break;
+        end
         wvm = trj.imu(k:k1,1:6);  t = trj.imu(k1,end);
         ins = insupdate(ins, wvm);
         kf.Phikk_1 = kffk(ins);
@@ -223,6 +242,10 @@ for currMeasNr = 1 : roundTime
      
         k = k + nn;       
         
+    end
+    if stopEpoch < currMeasNr
+        disp('IMU data exhausted, stopping tight coupling early.');
+        break;
     end
 
     % 7. GNSS运行至下一次紧组合时刻
@@ -249,6 +272,17 @@ for currMeasNr = 1 : roundTime
     
     
 
+end
+
+if stopEpoch < roundTime
+    navResults.X  = navResults.X(1:stopEpoch);
+    navResults.Y  = navResults.Y(1:stopEpoch);
+    navResults.Z  = navResults.Z(1:stopEpoch);
+    navResults.dt = navResults.dt(1:stopEpoch);
+    navResults.VX = navResults.VX(1:stopEpoch);
+    navResults.VY = navResults.VY(1:stopEpoch);
+    navResults.VZ = navResults.VZ(1:stopEpoch);
+    navResults.df = navResults.df(1:stopEpoch);
 end
 
 %% Quick result plots (skip invalid first solution)
