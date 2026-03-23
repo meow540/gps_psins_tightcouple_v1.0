@@ -1,1 +1,7 @@
 *.mat
+*.asv
+deepIntegration/figures/
+deepIntegration/search_runs/
+deepIntegration/tmp_*.m
+tmp_*.m
+tmp_*

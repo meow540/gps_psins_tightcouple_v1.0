@@ -46,6 +46,9 @@ function [eph, TOW] = ephemeris(bits, D30Star)
 %CVS record:
 %$Id: ephemeris.m,v 1.1.2.7 2006/08/14 11:38:22 dpl Exp $
 
+% Ensure outputs are always assigned even when frame IDs are invalid.
+eph = struct();
+TOW = NaN;
 
 %% Check if there is enough data ==========================================
 if length(bits) < 1500

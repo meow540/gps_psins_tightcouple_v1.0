@@ -37,5 +37,3 @@ global ggps
         v_r_s(ii,1) = vrs(ii,:) * LOS(ii,:)'; 
     end
 end
-
-
