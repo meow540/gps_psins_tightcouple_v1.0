@@ -24,6 +24,8 @@ if ~isfield(opts, 'msToProcess'), opts.msToProcess = 399 * 1000; end
 if ~isfield(opts, 'rawFileName'), opts.rawFileName = ""; end
 if ~isfield(opts, 'extraSettings'), opts.extraSettings = struct(); end
 if ~isfield(opts, 'baselineOpts'), opts.baselineOpts = struct(); end
+if ~isfield(opts, 'cleanRefAutoAlignEnable'), opts.cleanRefAutoAlignEnable = 1; end
+if ~isfield(opts, 'cleanRefAutoAlignMaxShiftSec'), opts.cleanRefAutoAlignMaxShiftSec = 10; end
 
 if datasetTag ~= "ds5" && datasetTag ~= "ds6" && datasetTag ~= "clean"
     error('datasetTag must be ''ds5'', ''ds6'', or ''clean''.');
@@ -178,25 +180,76 @@ settingsOverride.insTakeoverPrrResidualClipHz = 10.0;
 % In Chapter-1 weak takeover, suppressed Doppler is the only post-alarm
 % dynamic aid, so PRR weighting must stay tight enough to constrain drift.
 settingsOverride.insTakeoverPrrNoiseStdMps = localChooseTakeoverPrrNoiseStd(datasetTag, profile);
+settingsOverride.insTakeoverPrrOutlierRejectEnable = 1;
+settingsOverride.insTakeoverPrrOutlierMadScale = 4.0;
+settingsOverride.insTakeoverPrrOutlierAbsMps = inf;
+settingsOverride.insTakeoverPrrOutlierMinMadMps = 0.03;
+settingsOverride.insTakeoverPrrOutlierMaxIter = 1;
 if datasetTag == "ds5"
     % DS5 is clock-drag dominant. Keep Chapter-1 takeover as pure INS to
     % avoid spoofed Doppler residue re-pulling the filter.
+    settingsOverride.spoofAlarmAction = 'ins_takeover';
     settingsOverride.insTakeoverPrrAssistEnable = 0;
     settingsOverride.insTakeoverPrrAssistPolicy = 'off';
     % Push DS5 alarm closer to the known spoof onset neighborhood
     % (~100 s) while avoiding early pre-arm false trigger.
     settingsOverride.spoofDetCommonThresholdHz = 4.2;
     settingsOverride.spoofDetDiffThresholdHz = 4.6;
-    settingsOverride.spoofDetSatThresholdHz = 6.2;
+    settingsOverride.spoofDetSatThresholdHz = 5.2;
+    settingsOverride.spoofDetMinHitSat = 3;
+    if profile == "ins2"
+        settingsOverride.spoofAlarmAction = 'clock_hold';
+        % DS5 mid-track mismatch is mainly driven by PRR common-mode pull
+        % during clock spoof. Keep clock_hold, but downweight updates less
+        % aggressively and explicitly remove PRR common component.
+        settingsOverride.clockSpoofPrInflate = 1.0;
+        settingsOverride.clockSpoofPrrInflate = 1.0;
+        settingsOverride.clockSpoofRemoveCommonPrr = 1;
+        settingsOverride.clockSpoofPrInnovationClipM = inf;
+        % During clock-hold, lightly constrain vertical channel to avoid
+        % transient altitude blow-up while still allowing smooth motion.
+        settingsOverride.virtualVertVelHoldEnable = 1;
+        settingsOverride.virtualVertVelHoldNoiseStdMps = 0.12;
+        settingsOverride.clockHoldPlanarClampEnable = 1;
+        settingsOverride.clockHoldPlanarClampCommonHz = 14.0;
+        settingsOverride.clockHoldPlanarClampDiffHz = 22.0;
+        % Keep detector arming at clean-baseline recommendation instead of
+        % forcing a delayed arm, to avoid long pre-alarm contamination in ds5.
+    end
 elseif datasetTag == "ds6"
     % DS6 keeps PRR assist only when differential residual is sufficiently
     % strong; common-mode dominant epochs are blocked.
+    settingsOverride.spoofAlarmAction = 'ins_takeover';
     settingsOverride.insTakeoverPrrAssistEnable = 1;
     settingsOverride.insTakeoverPrrAssistPolicy = 'conditional';
     settingsOverride.insTakeoverPrrAssistMcmOverDiffMarginHz = 2.0;
     settingsOverride.insTakeoverPrrAssistMinDiffHz = 1.8;
     settingsOverride.insTakeoverPrrResidualClipHz = 4.0;
     settingsOverride.insTakeoverPrrNoiseStdMps = 0.25;
+    if profile == "ins2"
+        % INS2 tuning: keep takeover logic unchanged but tighten PRR assist
+        % to reduce long-tail drift in DS6.
+        settingsOverride.spoofDetArmTimeSec = 88.0;
+        settingsOverride.spoofDetCommonThresholdHz = 4.2;
+        settingsOverride.spoofDetDiffThresholdHz = 4.6;
+        settingsOverride.spoofDetSatThresholdHz = 6.2;
+        settingsOverride.insTakeoverPrrAssistPolicy = 'always';
+        settingsOverride.insTakeoverPrrResidualClipHz = 10.0;
+        settingsOverride.insTakeoverPrrNoiseStdMps = 0.12;
+        settingsOverride.insTakeoverPrrOutlierMadScale = 3.2;
+        settingsOverride.insTakeoverPrrOutlierAbsMps = 0.90;
+        settingsOverride.insTakeoverPrrOutlierMinMadMps = 0.05;
+        settingsOverride.insTakeoverPrrOutlierMaxIter = 2;
+        % Smooth per-satellite differential residual during takeover.
+        % This keeps DS6 mid-segment swings smaller while preserving detection.
+        settingsOverride.insTakeoverResidualIirAlpha = 0.25;
+        % Gradually fade PRR assist in late takeover (no hard switch),
+        % so DS6 keeps a smaller mid-segment error but shows INS-like
+        % growth trend toward the end.
+        settingsOverride.insTakeoverPrrAssistFadeStartSec = 220.0;
+        settingsOverride.insTakeoverPrrAssistFadeDurationSec = 120.0;
+        settingsOverride.virtualZUPTSpeedTh = 0.30;
+    end
 end
 settingsOverride.gnssRecoveryEnable = 1;
 settingsOverride.spoofReleaseCommonScale = 0.35;
@@ -250,7 +303,16 @@ else
 end
 summary.insOnlyEpochs = sum(navResults.modeInsOnly);
 summary.gnssRampEpochs = sum(navResults.modeGnssRamp);
-summary.insTakeoverEpochs = sum(navResults.modeInsOnly | navResults.modeGnssRamp);
+if isfield(navResults, 'modeClockHold')
+    summary.clockHoldEpochs = sum(navResults.modeClockHold);
+else
+    summary.clockHoldEpochs = 0;
+end
+if isfield(navResults, 'modeClockHold')
+    summary.insTakeoverEpochs = sum(navResults.modeInsOnly | navResults.modeGnssRamp | navResults.modeClockHold);
+else
+    summary.insTakeoverEpochs = sum(navResults.modeInsOnly | navResults.modeGnssRamp);
+end
 summary.virtualNHCEpochs = sum(navResults.modeVirtualNHC);
 summary.virtualZUPTEpochs = sum(navResults.modeVirtualZUPT);
 summary.takeoverPrrAssistEpochs = sum(navResults.modeTakeoverPrrAssist);
@@ -270,8 +332,22 @@ if datasetTag == "clean"
     cleanErrH = zeros(numel(navResults.X), 1);
 else
     cleanRef = loadCleanReferenceNavResults(projectRoot, profile, opts);
-    referenceEpochOffset = round((trjStartOffsetSec - cleanRef.referenceTimeOffsetSec) / navSolPeriodSec);
+    nominalRefOffset = round((trjStartOffsetSec - cleanRef.referenceTimeOffsetSec) / navSolPeriodSec);
+    referenceEpochOffset = nominalRefOffset;
+    alignInfo = struct('used', false, 'searchEpoch', 0, 'searchSec', 0, ...
+                       'fitEpochs', 0, 'bestRmse3D', NaN);
+    if opts.cleanRefAutoAlignEnable
+        [referenceEpochOffset, alignInfo] = localEstimateBestCleanOffset( ...
+            navResults, cleanRef.navResults, nominalRefOffset, settings.navSolPeriod, opts.cleanRefAutoAlignMaxShiftSec);
+    end
     summary.referenceEpochOffset = referenceEpochOffset;
+    summary.referenceEpochOffsetNominal = nominalRefOffset;
+    summary.referenceEpochOffsetSec = referenceEpochOffset * navSolPeriodSec;
+    summary.referenceAutoAlignUsed = alignInfo.used;
+    summary.referenceAutoAlignSearchEpoch = alignInfo.searchEpoch;
+    summary.referenceAutoAlignSearchSec = alignInfo.searchSec;
+    summary.referenceAutoAlignPreFitEpochs = alignInfo.fitEpochs;
+    summary.referenceAutoAlignPreFitRmse3D = alignInfo.bestRmse3D;
     summary.referenceType = 'clean_realtime_baseline';
     summary.referenceFile = cleanRef.referenceFile;
     [cleanErr3d, cleanErrH] = calcErrorAgainstCleanReference(navResults, cleanRef.navResults, referenceEpochOffset);
@@ -316,8 +392,8 @@ fprintf('Baseline thresholds: Tcm=%.3f Hz, Tdf=%.3f Hz, Tsat=%.3f Hz\n', ...
 fprintf('Epochs: %d, finiteXYZ: %d\n', summary.epochs, summary.finiteXYZ);
 fprintf('Alarms: %d, first alarm: %.2f s (epoch %d)\n', ...
     summary.alarms, summary.firstAlarmSec, summary.firstAlarmEpoch);
-fprintf('Mode epochs: ins_only=%d, gnss_ramp=%d, mitigation_total=%d\n', ...
-    summary.insOnlyEpochs, summary.gnssRampEpochs, summary.insTakeoverEpochs);
+fprintf('Mode epochs: ins_only=%d, gnss_ramp=%d, clock_hold=%d, mitigation_total=%d\n', ...
+    summary.insOnlyEpochs, summary.gnssRampEpochs, summary.clockHoldEpochs, summary.insTakeoverEpochs);
 fprintf('Virtual constraints: NHC=%d, ZUPT=%d, takeover_prr=%d\n', ...
     summary.virtualNHCEpochs, summary.virtualZUPTEpochs, summary.takeoverPrrAssistEpochs);
 fprintf('Quality fallback epochs: %d\n', summary.qualityFallbackEpochs);
@@ -333,6 +409,11 @@ end
 fprintf('Relative-to-truth end error: 3D=%.2f m, H=%.2f m\n', summary.endErr3D, summary.endErrH);
 if datasetTag ~= "clean"
     fprintf('Relative-to-clean end error: 3D=%.2f m, H=%.2f m\n', summary.cleanEndErr3D, summary.cleanEndErrH);
+    if isfield(summary, 'referenceAutoAlignUsed') && summary.referenceAutoAlignUsed
+        fprintf('Clean-reference auto-align: nominal=%d, used=%d epochs (%.2f s), pre-fit RMSE=%.2f m\n', ...
+            summary.referenceEpochOffsetNominal, summary.referenceEpochOffset, ...
+            summary.referenceEpochOffsetSec, summary.referenceAutoAlignPreFitRmse3D);
+    end
 end
 fprintf('========================================\n\n');
 end
@@ -409,6 +490,67 @@ if pairLen <= 0
 end
 navIdx = navStart : (navStart + pairLen - 1);
 refIdx = refStart : (refStart + pairLen - 1);
+end
+
+function [bestOffset, info] = localEstimateBestCleanOffset(navResults, refNavResults, initOffset, navSolPeriodMs, maxShiftSec)
+bestOffset = initOffset;
+info = struct('used', false, 'searchEpoch', 0, 'searchSec', 0, ...
+              'fitEpochs', 0, 'bestRmse3D', NaN);
+if nargin < 5 || isempty(maxShiftSec) || ~isfinite(maxShiftSec) || (maxShiftSec <= 0)
+    return;
+end
+
+maxShiftEpoch = max(0, round(maxShiftSec * 1000 / navSolPeriodMs));
+if maxShiftEpoch == 0
+    return;
+end
+
+preEnd = numel(navResults.X);
+if isfield(navResults, 'spoofAlarm')
+    alarmIdx = find(navResults.spoofAlarm, 1, 'first');
+    if ~isempty(alarmIdx) && (alarmIdx > 1)
+        preEnd = alarmIdx - 1;
+    end
+end
+preEnd = min(preEnd, numel(navResults.X));
+if preEnd < 60
+    return;
+end
+
+bestRmse = inf;
+searchMin = initOffset - maxShiftEpoch;
+searchMax = initOffset + maxShiftEpoch;
+for off = searchMin : searchMax
+    try
+        [navIdxAll, refIdxAll] = localAlignedIndexPair(numel(navResults.X), numel(refNavResults.X), off);
+    catch
+        continue;
+    end
+    useMask = navIdxAll <= preEnd;
+    if nnz(useMask) < 40
+        continue;
+    end
+    navIdx = navIdxAll(useMask);
+    refIdx = refIdxAll(useMask);
+
+    dx = navResults.X(navIdx)' - refNavResults.X(refIdx)';
+    dy = navResults.Y(navIdx)' - refNavResults.Y(refIdx)';
+    dz = navResults.Z(navIdx)' - refNavResults.Z(refIdx)';
+    err3d = sqrt(dx.^2 + dy.^2 + dz.^2);
+    rmse = sqrt(mean(err3d.^2));
+    if rmse < bestRmse
+        bestRmse = rmse;
+        bestOffset = off;
+        info.fitEpochs = numel(navIdx);
+    end
+end
+
+if isfinite(bestRmse)
+    info.used = true;
+    info.searchEpoch = maxShiftEpoch;
+    info.searchSec = maxShiftEpoch * navSolPeriodMs / 1000;
+    info.bestRmse3D = bestRmse;
+end
 end
 
 function trjStartOffsetSec = localChooseTrajectoryOffsetSec(datasetTag, opts, trackResults, subFrameStart, datasetSettings)

@@ -94,6 +94,7 @@ else
 end
 
 ins = insinit(ins0, ts);
+insShadow = ins;
 
 if ~exist('imuerr', 'var')
     switch lower(settings.imuerrProfile)
@@ -124,6 +125,7 @@ while (t0_gps + (t - t0_imu)) < positioningTime
     end
     wvm = trj.imu(k:k1,1:6);  t = trj.imu(k1,end);
     ins = insupdate(ins, wvm);
+    insShadow = insupdate(insShadow, wvm);
     kf.Phikk_1 = kffk(ins);
     kf = kfupdate(kf);
 
@@ -300,12 +302,18 @@ if ~isfield(settings, 'virtualZUPTNoiseStdMps'), settings.virtualZUPTNoiseStdMps
 if ~isfield(settings, 'tcUseRangeRateUpdate'), settings.tcUseRangeRateUpdate = 1; end
 if ~isfield(settings, 'tcRangeNoiseStdM'), settings.tcRangeNoiseStdM = 2.0; end
 if ~isfield(settings, 'tcRangeRateNoiseStdMps'), settings.tcRangeRateNoiseStdMps = 0.10; end
+if ~isfield(settings, 'tcRangeRateInnovationClipMps'), settings.tcRangeRateInnovationClipMps = inf; end
+if ~isfield(settings, 'insTakeoverPrrInnovationClipMps'), settings.insTakeoverPrrInnovationClipMps = inf; end
 if ~isfield(settings, 'tcNavMinElevDeg'), settings.tcNavMinElevDeg = max(10, settings.elevationMask); end
 if ~isfield(settings, 'tcNavMinSat'), settings.tcNavMinSat = 4; end
 if ~isfield(settings, 'insTakeoverPrrAssistEnable'), settings.insTakeoverPrrAssistEnable = 1; end
 if ~isfield(settings, 'insTakeoverPrrAssistPolicy'), settings.insTakeoverPrrAssistPolicy = 'always'; end
 if ~isfield(settings, 'insTakeoverPrrAssistMcmOverDiffMarginHz'), settings.insTakeoverPrrAssistMcmOverDiffMarginHz = inf; end
 if ~isfield(settings, 'insTakeoverPrrAssistMinDiffHz'), settings.insTakeoverPrrAssistMinDiffHz = 0.0; end
+if ~isfield(settings, 'insTakeoverPrrAssistMinWeight'), settings.insTakeoverPrrAssistMinWeight = 0.25; end
+if ~isfield(settings, 'insTakeoverPrrAssistFullWeightMarginHz'), settings.insTakeoverPrrAssistFullWeightMarginHz = 0.5; end
+if ~isfield(settings, 'insTakeoverPrrAssistZeroWeightMarginHz'), settings.insTakeoverPrrAssistZeroWeightMarginHz = 4.0; end
+if ~isfield(settings, 'insTakeoverPrrAssistDiffRefHz'), settings.insTakeoverPrrAssistDiffRefHz = 6.0; end
 % Weak-assisted takeover keeps only the differential Doppler part after
 
 % common-mode spoof removal. The clip must be large enough to constrain
@@ -314,6 +322,18 @@ if ~isfield(settings, 'insTakeoverPrrAssistMinDiffHz'), settings.insTakeoverPrrA
 
 if ~isfield(settings, 'insTakeoverPrrResidualClipHz'), settings.insTakeoverPrrResidualClipHz = 10.0; end
 if ~isfield(settings, 'insTakeoverPrrNoiseStdMps'), settings.insTakeoverPrrNoiseStdMps = 0.1; end
+if ~isfield(settings, 'insTakeoverPrrOutlierRejectEnable'), settings.insTakeoverPrrOutlierRejectEnable = 1; end
+if ~isfield(settings, 'insTakeoverPrrOutlierMadScale'), settings.insTakeoverPrrOutlierMadScale = 4.0; end
+if ~isfield(settings, 'insTakeoverPrrOutlierAbsMps'), settings.insTakeoverPrrOutlierAbsMps = inf; end
+if ~isfield(settings, 'insTakeoverPrrOutlierMinMadMps'), settings.insTakeoverPrrOutlierMinMadMps = 0.03; end
+if ~isfield(settings, 'insTakeoverPrrOutlierMaxIter'), settings.insTakeoverPrrOutlierMaxIter = 1; end
+if ~isfield(settings, 'insTakeoverResidualIirAlpha'), settings.insTakeoverResidualIirAlpha = 1.0; end
+if ~isfield(settings, 'insTakeoverResidualIirRampSec'), settings.insTakeoverResidualIirRampSec = 0.0; end
+if ~isfield(settings, 'insTakeoverPrrMaxRejectRatio'), settings.insTakeoverPrrMaxRejectRatio = 1.0; end
+if ~isfield(settings, 'insTakeoverAssistWarmupSec'), settings.insTakeoverAssistWarmupSec = 0; end
+if ~isfield(settings, 'insTakeoverPrrAssistMaxHoldSec'), settings.insTakeoverPrrAssistMaxHoldSec = inf; end
+if ~isfield(settings, 'insTakeoverPrrAssistFadeStartSec'), settings.insTakeoverPrrAssistFadeStartSec = inf; end
+if ~isfield(settings, 'insTakeoverPrrAssistFadeDurationSec'), settings.insTakeoverPrrAssistFadeDurationSec = 0; end
 if ~isfield(settings, 'gnssRecoveryEnable'), settings.gnssRecoveryEnable = 1; end
 if ~isfield(settings, 'spoofReleaseCommonScale'), settings.spoofReleaseCommonScale = 0.35; end
 if ~isfield(settings, 'spoofReleaseDiffScale'), settings.spoofReleaseDiffScale = 0.35; end
@@ -321,9 +341,26 @@ if ~isfield(settings, 'spoofReleaseSatScale'), settings.spoofReleaseSatScale = 0
 if ~isfield(settings, 'spoofReleaseMinHitSat'), settings.spoofReleaseMinHitSat = 0; end
 if ~isfield(settings, 'spoofReleaseConfirmEpochs'), settings.spoofReleaseConfirmEpochs = 20; end
 if ~isfield(settings, 'spoofRecoveryMinLockSec'), settings.spoofRecoveryMinLockSec = 20; end
+if ~isfield(settings, 'insTakeoverForcedProbeEnable'), settings.insTakeoverForcedProbeEnable = 0; end
+if ~isfield(settings, 'insTakeoverMaxHoldSec'), settings.insTakeoverMaxHoldSec = inf; end
+if ~isfield(settings, 'insTakeoverProbeIntervalSec'), settings.insTakeoverProbeIntervalSec = 30; end
 if ~isfield(settings, 'gnssRampDurationSec'), settings.gnssRampDurationSec = 10; end
 if ~isfield(settings, 'gnssRampPrScaleStart'), settings.gnssRampPrScaleStart = 10; end
 if ~isfield(settings, 'gnssRampPrrScaleStart'), settings.gnssRampPrrScaleStart = 5; end
+if ~isfield(settings, 'gnssRampEnablePseudorange'), settings.gnssRampEnablePseudorange = 1; end
+if ~isfield(settings, 'gnssRampUseSuppressedPrr'), settings.gnssRampUseSuppressedPrr = 0; end
+if ~isfield(settings, 'spoofAlarmAction'), settings.spoofAlarmAction = 'ins_takeover'; end
+if ~isfield(settings, 'clockSpoofPrInflate'), settings.clockSpoofPrInflate = 4.0; end
+if ~isfield(settings, 'clockSpoofPrrInflate'), settings.clockSpoofPrrInflate = 2.0; end
+if ~isfield(settings, 'clockSpoofRemoveCommonPr'), settings.clockSpoofRemoveCommonPr = 0; end
+if ~isfield(settings, 'clockSpoofRemoveCommonPrr'), settings.clockSpoofRemoveCommonPrr = 0; end
+if ~isfield(settings, 'clockSpoofPrInnovationClipM'), settings.clockSpoofPrInnovationClipM = inf; end
+if ~isfield(settings, 'clockSpoofHardPrDisableEnable'), settings.clockSpoofHardPrDisableEnable = 1; end
+if ~isfield(settings, 'clockSpoofHardMetricThresholdHz'), settings.clockSpoofHardMetricThresholdHz = inf; end
+if ~isfield(settings, 'clockSpoofHardDiffThresholdHz'), settings.clockSpoofHardDiffThresholdHz = inf; end
+if ~isfield(settings, 'clockSpoofPrrAssistWhenPrOff'), settings.clockSpoofPrrAssistWhenPrOff = 1; end
+if ~isfield(settings, 'clockSpoofUseSuppressedPrr'), settings.clockSpoofUseSuppressedPrr = 1; end
+if ~isfield(settings, 'clockSpoofDecoupleClockStates'), settings.clockSpoofDecoupleClockStates = 1; end
 if ~isfield(settings, 'virtualSpeedHoldEnable'), settings.virtualSpeedHoldEnable = 0; end
 if ~isfield(settings, 'virtualSpeedHoldMinMps'), settings.virtualSpeedHoldMinMps = 1.0; end
 if ~isfield(settings, 'virtualSpeedHoldNoiseStdMps'), settings.virtualSpeedHoldNoiseStdMps = 0.8; end
@@ -333,6 +370,9 @@ if ~isfield(settings, 'virtualPitchRollHoldEnable'), settings.virtualPitchRollHo
 if ~isfield(settings, 'virtualPitchRollHoldNoiseStdRad'), settings.virtualPitchRollHoldNoiseStdRad = [0.5; 0.5] * pi / 180; end
 if ~isfield(settings, 'virtualVertVelHoldEnable'), settings.virtualVertVelHoldEnable = 0; end
 if ~isfield(settings, 'virtualVertVelHoldNoiseStdMps'), settings.virtualVertVelHoldNoiseStdMps = 0.10; end
+if ~isfield(settings, 'clockHoldPlanarClampEnable'), settings.clockHoldPlanarClampEnable = 0; end
+if ~isfield(settings, 'clockHoldPlanarClampCommonHz'), settings.clockHoldPlanarClampCommonHz = inf; end
+if ~isfield(settings, 'clockHoldPlanarClampDiffHz'), settings.clockHoldPlanarClampDiffHz = inf; end
 if ~isfield(settings, 'leverArm_b'), settings.leverArm_b = [0; 0; 0]; end
 if ~isfield(settings, 'kfGuardEnable'), settings.kfGuardEnable = 1; end
 if ~isfield(settings, 'kfGuardStateAbsMax'), settings.kfGuardStateAbsMax = 1e9; end
@@ -340,6 +380,13 @@ if ~isfield(settings, 'trustedGnssFeedbackStr'), settings.trustedGnssFeedbackStr
 if ~isfield(settings, 'takeoverPrrFeedbackStr'), settings.takeoverPrrFeedbackStr = 'avp'; end
 if ~isfield(settings, 'spoofMitigationMode'), settings.spoofMitigationMode = 'ins_only'; end
 settings.spoofMitigationMode = 'ins_only';
+if ~isfield(settings, 'spoofTakeoverUseShadowIns'), settings.spoofTakeoverUseShadowIns = 1; end
+if ~isfield(settings, 'spoofTakeoverResetClockState'), settings.spoofTakeoverResetClockState = 1; end
+if ~isfield(settings, 'spoofTakeoverResetNavState'), settings.spoofTakeoverResetNavState = 0; end
+if ~isfield(settings, 'spoofTakeoverShadowKeepPos'), settings.spoofTakeoverShadowKeepPos = 1; end
+% Keep pre-alarm velocity when switching to the shadow INS to avoid a
+% non-physical velocity jump at takeover entry.
+if ~isfield(settings, 'spoofTakeoverShadowKeepVel'), settings.spoofTakeoverShadowKeepVel = 1; end
 
 leverArm_b = settings.leverArm_b(:);
 if numel(leverArm_b) ~= 3
@@ -361,6 +408,7 @@ navResults.modeNormal = true(1, roundTime);
 navResults.modeInsOnly = false(1, roundTime);
 navResults.modeInsTakeover = false(1, roundTime);
 navResults.modeGnssRamp = false(1, roundTime);
+navResults.modeClockHold = false(1, roundTime);
 navResults.modeKinConstraint = false(1, roundTime);
 navResults.modeVirtualNHC = false(1, roundTime);
 navResults.modeVirtualZUPT = false(1, roundTime);
@@ -369,13 +417,15 @@ navResults.modeVirtualHeightHold = false(1, roundTime);
 navResults.modeVirtualPitchRollHold = false(1, roundTime);
 navResults.modeVirtualVertVelHold = false(1, roundTime);
 navResults.modeTakeoverPrrAssist = false(1, roundTime);
+navResults.takeoverPrrAssistWeight = zeros(1, roundTime);
 navResults.kinCorrectionNorm = zeros(1, roundTime);
 
 navResults.spoofFlag = false(1, roundTime);
 navResults.spoofAlarm = false(1, roundTime);
 navResults.recoveryCandidate = false(1, roundTime);
 navResults.recoveryCounter = zeros(1, roundTime);
-navResults.modeState = zeros(1, roundTime); % 0:normal,1:ins_only,2:gnss_ramp
+navResults.recoveryForced = false(1, roundTime);
+navResults.modeState = zeros(1, roundTime); % 0:normal,1:ins_only,2:gnss_ramp,3:clock_hold
 
 navResults.dopplerGpsMeasHz = nan(numActChnList, roundTime);
 navResults.dopplerInsPredHz = nan(numActChnList, roundTime);
@@ -411,6 +461,13 @@ navResults.qualityFallbackCode = zeros(1, roundTime); % 0:none,1:invalid meas,2:
 navResults.gnssUpdateUsed = false(1, roundTime);
 navResults.gnssWeightScalePr = ones(1, roundTime);
 navResults.gnssWeightScalePrr = ones(1, roundTime);
+navResults.prrCandidateSatNum = zeros(1, roundTime);
+navResults.prrUsedSatNum = zeros(1, roundTime);
+navResults.prrRejectedSatNum = zeros(1, roundTime);
+navResults.prrOutlierCenterMps = nan(1, roundTime);
+navResults.prrOutlierSigmaMps = nan(1, roundTime);
+navResults.prrOutlierGateMps = nan(1, roundTime);
+navResults.prrRejectRatio = zeros(1, roundTime);
 
 baselinePrnList = navResults.prnList;
 if isfield(settings, 'spoofDetBaselinePrnList')
@@ -447,6 +504,7 @@ l1Freq = 1575.42e6;
 MODE_NORMAL = 0;
 MODE_INS_ONLY = 1;
 MODE_GNSS_RAMP = 2;
+MODE_CLOCK_HOLD = 3;
 navMode = MODE_NORMAL;
 confirmCounter = 0;
 releaseCounter = 0;
@@ -456,6 +514,14 @@ lastAlarmEpoch = -1;
 releaseConfirmEpochs = max(1, round(settings.spoofReleaseConfirmEpochs));
 rampEpochs = max(1, round(settings.gnssRampDurationSec * 1000 / settings.navSolPeriod));
 lockEpochs = max(0, ceil(settings.spoofRecoveryMinLockSec * 1000 / settings.navSolPeriod));
+if isfinite(settings.insTakeoverMaxHoldSec) && (settings.insTakeoverMaxHoldSec > 0)
+    maxInsHoldEpochs = max(1, round(settings.insTakeoverMaxHoldSec * 1000 / settings.navSolPeriod));
+else
+    maxInsHoldEpochs = inf;
+end
+probeIntervalEpochs = max(1, round(settings.insTakeoverProbeIntervalSec * 1000 / settings.navSolPeriod));
+insOnlyHoldCounter = 0;
+lastForcedProbeEpoch = -1e9;
 releaseCommonThresholdHz = settings.spoofDetCommonThresholdHz * settings.spoofReleaseCommonScale;
 releaseDiffThresholdHz = settings.spoofDetDiffThresholdHz * settings.spoofReleaseDiffScale;
 releaseSatThresholdHz = settings.spoofDetSatThresholdHz * settings.spoofReleaseSatScale;
@@ -465,6 +531,8 @@ stopEpoch = roundTime;
 takeoverForwardSpeedRefMps = nan;
 takeoverHeightRefM = nan;
 takeoverPitchRollRefRad = [nan; nan];
+clockSpoofActive = false;
+takeoverResidualDiffFiltHz = nan(numActChnList, 1);
 
 for currMeasNr = 1 : roundTime
     if settings.verboseEpochPrint
@@ -535,7 +603,7 @@ for currMeasNr = 1 : roundTime
                 (hitCommon || hitDiff);
     lockActive = (lastAlarmEpoch > 0) && ((currMeasNr - lastAlarmEpoch) < lockEpochs);
     releaseStable = detectorArmed && settings.gnssRecoveryEnable && ...
-                    (navMode == MODE_INS_ONLY) && ...
+                    ((navMode == MODE_INS_ONLY) || clockSpoofActive) && ...
                     (validDetNum >= settings.spoofDetMinSat) && ...
                     isfinite(metricCommonHz) && isfinite(metricDiffHz) && ...
                     isfinite(metricCommonRawHz) && isfinite(metricDiffRawHz) && ...
@@ -543,20 +611,26 @@ for currMeasNr = 1 : roundTime
                     (metricDiffHz < releaseDiffThresholdHz) && ...
                     (metricCommonRawHz < releaseCommonThresholdHz) && ...
                     (metricDiffRawHz < releaseDiffThresholdHz) && ...
-                    (hitSatNum == 0) && ...
                     (releaseHitSatNum <= settings.spoofReleaseMinHitSat) && ...
                     ~lockActive;
 
     alarmRaised = false;
     recoveryAccepted = false;
-    if navMode ~= MODE_INS_ONLY
+    recoveryForced = false;
+    if navMode == MODE_INS_ONLY
+        insOnlyHoldCounter = insOnlyHoldCounter + 1;
+    else
+        insOnlyHoldCounter = 0;
+    end
+
+    if (navMode ~= MODE_INS_ONLY) && (~clockSpoofActive)
         if detectHit
             confirmCounter = confirmCounter + 1;
         else
             confirmCounter = 0;
         end
         if confirmCounter >= settings.spoofDetConfirmEpochs
-            navMode = MODE_INS_ONLY;
+            action = lower(strtrim(settings.spoofAlarmAction));
             confirmCounter = 0;
             releaseCounter = 0;
             rampCounter = 0;
@@ -565,10 +639,48 @@ for currMeasNr = 1 : roundTime
                 spoofStartEpoch = currMeasNr;
             end
             alarmRaised = true;
-            fprintf('[ALARM] Spoofing detected at epoch %d, Mcm = %.3f Hz, Mdf = %.3f Hz\n', ...
-                currMeasNr, metricCommonHz, metricDiffHz);
+            if strcmp(action, 'clock_hold')
+                clockSpoofActive = true;
+                navMode = MODE_NORMAL;
+                if settings.clockSpoofDecoupleClockStates && (numel(kf.xk) >= 2)
+                    kf.xk(end-1:end) = 0;
+                end
+                fprintf('[ALARM] Common-mode spoof detected at epoch %d, enter CLOCK_HOLD (Mcm=%.3f, Mdf=%.3f).\n', ...
+                    currMeasNr, metricCommonHz, metricDiffHz);
+            else
+                navMode = MODE_INS_ONLY;
+                insOnlyHoldCounter = 0;
+                fprintf('[ALARM] Spoofing detected at epoch %d, Mcm = %.3f Hz, Mdf = %.3f Hz\n', ...
+                    currMeasNr, metricCommonHz, metricDiffHz);
+            end
         end
-    else
+    elseif navMode == MODE_INS_ONLY
+        confirmCounter = 0;
+        if releaseStable
+            releaseCounter = releaseCounter + 1;
+        else
+            releaseCounter = 0;
+        end
+        forcedProbeReady = settings.insTakeoverForcedProbeEnable && ...
+                           isfinite(maxInsHoldEpochs) && ...
+                           (insOnlyHoldCounter >= maxInsHoldEpochs) && ...
+                           ((currMeasNr - lastForcedProbeEpoch) >= probeIntervalEpochs);
+        if (releaseCounter >= releaseConfirmEpochs) || forcedProbeReady
+            navMode = MODE_GNSS_RAMP;
+            rampCounter = 1;
+            releaseCounter = 0;
+            recoveryAccepted = true;
+            recoveryForced = forcedProbeReady;
+            if forcedProbeReady
+                lastForcedProbeEpoch = currMeasNr;
+                fprintf('[RECOVER] Forced GNSS probe ramp at epoch %d, Mcm = %.3f Hz, Mdf = %.3f Hz\n', ...
+                    currMeasNr, metricCommonHz, metricDiffHz);
+            else
+                fprintf('[RECOVER] GNSS ramp entered at epoch %d, Mcm = %.3f Hz, Mdf = %.3f Hz\n', ...
+                    currMeasNr, metricCommonHz, metricDiffHz);
+            end
+        end
+    elseif clockSpoofActive
         confirmCounter = 0;
         if releaseStable
             releaseCounter = releaseCounter + 1;
@@ -576,14 +688,25 @@ for currMeasNr = 1 : roundTime
             releaseCounter = 0;
         end
         if releaseCounter >= releaseConfirmEpochs
-            navMode = MODE_GNSS_RAMP;
-            rampCounter = 1;
+            clockSpoofActive = false;
             releaseCounter = 0;
             recoveryAccepted = true;
-            fprintf('[RECOVER] GNSS ramp entered at epoch %d, Mcm = %.3f Hz, Mdf = %.3f Hz\n', ...
-                currMeasNr, metricCommonHz, metricDiffHz);
+            fprintf('[RECOVER] CLOCK_HOLD cleared at epoch %d.\n', currMeasNr);
         end
     end
+    if alarmRaised && settings.spoofTakeoverUseShadowIns && (navMode == MODE_INS_ONLY)
+        insPreTakeover = ins;
+        ins = insShadow;
+        if settings.spoofTakeoverShadowKeepPos
+            ins.pos = insPreTakeover.pos;
+        end
+        if settings.spoofTakeoverShadowKeepVel
+            ins.vn = insPreTakeover.vn;
+        end
+        kf = localResetTakeoverState(kf, settings);
+        takeoverResidualDiffFiltHz(:) = nan;
+    end
+
     if alarmRaised || ((navMode == MODE_INS_ONLY) && ~isfinite(takeoverForwardSpeedRefMps))
         vbTakeover = ins.Cnb' * ins.vn;
         takeoverForwardSpeedRefMps = vbTakeover(1);
@@ -591,7 +714,8 @@ for currMeasNr = 1 : roundTime
         takeoverPitchRollRefRad = ins.att(1:2);
     end
 
-    modeNormal = (navMode == MODE_NORMAL);
+    modeClockHold = clockSpoofActive;
+    modeNormal = (navMode == MODE_NORMAL) && (~modeClockHold);
     modeInsTakeover = (navMode == MODE_INS_ONLY);
     modeGnssRamp = (navMode == MODE_GNSS_RAMP);
     gnssPrScale = 1;
@@ -604,26 +728,83 @@ for currMeasNr = 1 : roundTime
         rampBlend = max(0, 1 - rampFrac);
     end
 
+    severeClockSpoof = modeClockHold && settings.clockSpoofHardPrDisableEnable && ...
+                       (metricCommonHz >= settings.clockSpoofHardMetricThresholdHz || ...
+                        metricDiffHz >= settings.clockSpoofHardDiffThresholdHz);
+
     modeTakeoverPrrAssist = false;
+    takeoverPrrAssistWeight = 0;
     if modeInsTakeover
         dopplerSuppressAlpha = ones(size(dopplerMeasHz));
-        allowTakeoverPrrAssist = settings.insTakeoverPrrAssistEnable && ...
-                                 localTakeoverPrrAssistAllowed(metricCommonHz, metricDiffHz, settings);
-        if allowTakeoverPrrAssist && (validDetNum >= settings.spoofDetMinSat) && isfinite(commonCenterHz)
-            cleanTrendHz = baselineSatBiasHz + templateResidualHz(:, currMeasNr);
-            cleanTrendHz(~isfinite(cleanTrendHz)) = 0;
-            residualDiffHz = dopplerResidualDevHz - commonCenterHz;
-            residualDiffHz(~isfinite(residualDiffHz)) = 0;
-            clipHz = settings.insTakeoverPrrResidualClipHz;
-            residualDiffHz = min(max(residualDiffHz, -clipHz), clipHz);
-            dopplerSuppressedHz = dopplerPredRawHz + cleanTrendHz + residualDiffHz;
-            modeTakeoverPrrAssist = true;
+        takeoverPrrAssistWeight = localTakeoverPrrAssistWeight(metricCommonHz, metricDiffHz, settings);
+        assistMaxHoldEpochs = inf;
+        if isfinite(settings.insTakeoverPrrAssistMaxHoldSec) && (settings.insTakeoverPrrAssistMaxHoldSec > 0)
+            assistMaxHoldEpochs = max(1, round(settings.insTakeoverPrrAssistMaxHoldSec * 1000 / settings.navSolPeriod));
+        end
+        assistWindowOpen = (insOnlyHoldCounter <= assistMaxHoldEpochs);
+        if isfinite(settings.insTakeoverPrrAssistFadeStartSec) && ...
+                isfinite(settings.insTakeoverPrrAssistFadeDurationSec) && ...
+                (settings.insTakeoverPrrAssistFadeDurationSec > 0)
+            fadeStartEpochs = max(0, round(settings.insTakeoverPrrAssistFadeStartSec * 1000 / settings.navSolPeriod));
+            fadeDurEpochs = max(1, round(settings.insTakeoverPrrAssistFadeDurationSec * 1000 / settings.navSolPeriod));
+            fadeEpoch = insOnlyHoldCounter - fadeStartEpochs;
+            if fadeEpoch > 0
+                fadeFrac = min(1, fadeEpoch / fadeDurEpochs);
+                takeoverPrrAssistWeight = takeoverPrrAssistWeight * (1 - fadeFrac);
+            end
+        end
+        allowTakeoverPrrAssist = settings.insTakeoverPrrAssistEnable && (takeoverPrrAssistWeight > 0) && assistWindowOpen;
+        warmupEpochs = max(0, round(settings.insTakeoverAssistWarmupSec * 1000 / settings.navSolPeriod));
+        warmupActive = (insOnlyHoldCounter <= warmupEpochs);
+        if allowTakeoverPrrAssist
+            if warmupActive
+                dopplerSuppressedHz = dopplerPredRawHz;
+                modeTakeoverPrrAssist = true;
+            elseif (validDetNum >= settings.spoofDetMinSat) && isfinite(commonCenterHz)
+                cleanTrendHz = baselineSatBiasHz + templateResidualHz(:, currMeasNr);
+                cleanTrendHz(~isfinite(cleanTrendHz)) = 0;
+                residualDiffHz = dopplerResidualDevHz - commonCenterHz;
+                residualDiffHz(~isfinite(residualDiffHz)) = 0;
+                residualFiltAlpha = max(0, min(1, settings.insTakeoverResidualIirAlpha));
+                if (residualFiltAlpha < 1) && isfinite(settings.insTakeoverResidualIirRampSec) && (settings.insTakeoverResidualIirRampSec > 0)
+                    alphaRampEpochs = max(1, round(settings.insTakeoverResidualIirRampSec * 1000 / settings.navSolPeriod));
+                    alphaRampFrac = min(1, max(0, insOnlyHoldCounter / alphaRampEpochs));
+                    residualFiltAlpha = residualFiltAlpha + (1 - residualFiltAlpha) * alphaRampFrac;
+                end
+                if residualFiltAlpha < 1
+                    validRes = isfinite(residualDiffHz);
+                    initMask = validRes & ~isfinite(takeoverResidualDiffFiltHz);
+                    takeoverResidualDiffFiltHz(initMask) = residualDiffHz(initMask);
+                    updMask = validRes & isfinite(takeoverResidualDiffFiltHz);
+                    takeoverResidualDiffFiltHz(updMask) = residualFiltAlpha .* residualDiffHz(updMask) + ...
+                        (1 - residualFiltAlpha) .* takeoverResidualDiffFiltHz(updMask);
+                    residualDiffHz(updMask) = takeoverResidualDiffFiltHz(updMask);
+                else
+                    takeoverResidualDiffFiltHz(:) = residualDiffHz;
+                end
+                clipHz = settings.insTakeoverPrrResidualClipHz;
+                residualDiffHz = min(max(residualDiffHz, -clipHz), clipHz);
+                residualDiffHz = takeoverPrrAssistWeight * residualDiffHz;
+                dopplerSuppressedHz = dopplerPredRawHz + cleanTrendHz + residualDiffHz;
+                modeTakeoverPrrAssist = true;
+            else
+                dopplerSuppressedHz = dopplerPredRawHz;
+            end
         else
             dopplerSuppressedHz = dopplerPredRawHz;
         end
     elseif modeGnssRamp
         dopplerSuppressAlpha = rampBlend * ones(size(dopplerMeasHz));
         dopplerSuppressedHz = rampBlend .* dopplerPredRawHz + (1 - rampBlend) .* dopplerMeasHz;
+    elseif modeClockHold
+        dopplerSuppressAlpha = ones(size(dopplerMeasHz));
+        if severeClockSpoof
+            dopplerSuppressedHz = dopplerPredRawHz;
+            modeTakeoverPrrAssist = settings.clockSpoofPrrAssistWhenPrOff;
+        else
+            dopplerSuppressAlpha = zeros(size(dopplerMeasHz));
+            dopplerSuppressedHz = dopplerMeasHz;
+        end
     else
         dopplerSuppressAlpha = zeros(size(dopplerMeasHz));
         dopplerSuppressedHz = dopplerMeasHz;
@@ -643,6 +824,13 @@ for currMeasNr = 1 : roundTime
     vertVelResidualMps = nan;
     nhcResidualBody = [nan; nan];
     zuptResidualN = [nan; nan; nan];
+    prrCandidateSatNum = 0;
+    prrUsedSatNum = 0;
+    prrRejectedSatNum = 0;
+    prrOutlierCenterMps = nan;
+    prrOutlierSigmaMps = nan;
+    prrOutlierGateMps = nan;
+    prrRejectRatio = 0;
 
     if currMeasNr == 1
         navSolut_1 = postNavLoose(trackDeepIn, settings, eph, TOW);
@@ -653,28 +841,71 @@ for currMeasNr = 1 : roundTime
         end
     else
         delta_rawP = navSolut.rawP' + settings.c * navSolut.satClkCorr' - geomRhoDet;
-        if ~modeInsTakeover
+        if (~modeInsTakeover) && (settings.gnssRampEnablePseudorange || ~modeGnssRamp) && ~(modeClockHold && severeClockSpoof)
             navMaskPr = localBuildNavMeasurementMask(delta_rawP, AzElDet(:,2), settings.tcNavMinElevDeg, settings.tcNavMinSat);
             if any(navMaskPr)
                 el = max(AzElDet(navMaskPr,2), settings.tcNavMinElevDeg * pi / 180);
                 Hpr = kfhk(ins, LOSDet(navMaskPr, :));
                 Rpr = diag(((settings.tcRangeNoiseStdM.^2) * gnssPrScale) ./ (sin(el).^2));
+                deltaPrUse = delta_rawP(navMaskPr);
+                if modeClockHold
+                    commonPrBias = median(deltaPrUse, 'omitnan');
+                    if settings.clockSpoofRemoveCommonPr || settings.clockSpoofDecoupleClockStates
+                        if isfinite(commonPrBias)
+                            deltaPrUse = deltaPrUse - commonPrBias;
+                        end
+                    end
+                    if isfinite(settings.clockSpoofPrInnovationClipM) && (settings.clockSpoofPrInnovationClipM > 0)
+                        clipM = settings.clockSpoofPrInnovationClipM;
+                        commonPrClip = median(deltaPrUse, 'omitnan');
+                        if ~isfinite(commonPrClip)
+                            commonPrClip = 0;
+                        end
+                        deltaPrDiff = deltaPrUse - commonPrClip;
+                        deltaPrDiff = min(max(deltaPrDiff, -clipM), clipM);
+                        deltaPrUse = commonPrClip + deltaPrDiff;
+                    end
+                    if settings.clockSpoofDecoupleClockStates && (size(Hpr,2) >= 2)
+                        Hpr(:, end-1:end) = 0;
+                    end
+                    Rpr = Rpr * settings.clockSpoofPrInflate;
+                end
                 [kf, ins, prUpdateUsed, prFailCode] = localGuardedMeasurementUpdate( ...
-                    kf, ins, delta_rawP(navMaskPr), Hpr, Rpr, 'M', settings.trustedGnssFeedbackStr, settings);
+                    kf, ins, deltaPrUse, Hpr, Rpr, 'M', settings.trustedGnssFeedbackStr, settings);
             else
                 prUpdateUsed = false;
                 prFailCode = 1;
             end
             gnssUpdateUsed = prUpdateUsed;
             if prUpdateUsed
-                for ii = 1 : numActChnList
-                    trackDeepIn(ii).recvTime = trackDeepIn(ii).recvTime - kf.xk(end-1) / settings.c;
+                if ~(modeClockHold && settings.clockSpoofDecoupleClockStates)
+                    for ii = 1 : numActChnList
+                        trackDeepIn(ii).recvTime = trackDeepIn(ii).recvTime - kf.xk(end-1) / settings.c;
+                    end
                 end
             else
                 qualityFallbackCode = prFailCode;
             end
         end
-        if settings.tcUseRangeRateUpdate && (((~modeInsTakeover) && gnssUpdateUsed) || (modeInsTakeover && modeTakeoverPrrAssist))
+        allowPrrUpdate = false;
+        if modeInsTakeover
+            allowPrrUpdate = modeTakeoverPrrAssist;
+        elseif modeGnssRamp
+            if settings.gnssRampEnablePseudorange
+                allowPrrUpdate = gnssUpdateUsed;
+            else
+                allowPrrUpdate = true;
+            end
+        elseif modeClockHold
+            if severeClockSpoof
+                allowPrrUpdate = settings.clockSpoofPrrAssistWhenPrOff;
+            else
+                allowPrrUpdate = gnssUpdateUsed;
+            end
+        else
+            allowPrrUpdate = gnssUpdateUsed;
+        end
+        if settings.tcUseRangeRateUpdate && allowPrrUpdate
             [posxyzRate, ~] = blh2xyz(ins.pos);
             antVelNRate = ins.vn;
             if any(abs(leverArm_b) > 0)
@@ -687,21 +918,70 @@ for currMeasNr = 1 : roundTime
                 rawPdotAssist = -dopplerSuppressedHz * settings.c / l1Freq;
                 delta_rawPdot = rawPdotAssist + settings.c * navSolut.satClkDrift' - v_r_s_rate;
                 prrNoiseStd = settings.insTakeoverPrrNoiseStdMps;
+            elseif modeClockHold && severeClockSpoof && settings.clockSpoofUseSuppressedPrr
+                rawPdotAssist = -dopplerSuppressedHz * settings.c / l1Freq;
+                delta_rawPdot = rawPdotAssist + settings.c * navSolut.satClkDrift' - v_r_s_rate;
+                prrNoiseStd = settings.insTakeoverPrrNoiseStdMps;
+            elseif modeGnssRamp && settings.gnssRampUseSuppressedPrr
+                rawPdotAssist = -dopplerSuppressedHz * settings.c / l1Freq;
+                delta_rawPdot = rawPdotAssist + settings.c * navSolut.satClkDrift' - v_r_s_rate;
+                prrNoiseStd = settings.tcRangeRateNoiseStdMps * sqrt(gnssPrrScale);
             else
                 delta_rawPdot = navSolut.rawP_dot' + settings.c * navSolut.satClkDrift' - v_r_s_rate;
                 prrNoiseStd = settings.tcRangeRateNoiseStdMps * sqrt(gnssPrrScale);
             end
+            if modeClockHold
+                prrNoiseStd = prrNoiseStd * settings.clockSpoofPrrInflate;
+            end
             navMaskPrr = localBuildNavMeasurementMask(delta_rawPdot, AzElRate(:,2), settings.tcNavMinElevDeg, settings.tcNavMinSat);
+            if modeClockHold && settings.clockSpoofRemoveCommonPrr && any(navMaskPrr)
+                commonPrrBias = median(delta_rawPdot(navMaskPrr), 'omitnan');
+                if isfinite(commonPrrBias)
+                    delta_rawPdot(navMaskPrr) = delta_rawPdot(navMaskPrr) - commonPrrBias;
+                end
+            end
+            prrCandidateSatNum = nnz(navMaskPrr);
+            applyPrrOutlierReject = settings.insTakeoverPrrOutlierRejectEnable && ...
+                (modeInsTakeover || (modeClockHold && severeClockSpoof && settings.clockSpoofUseSuppressedPrr));
+            if applyPrrOutlierReject && (prrCandidateSatNum >= settings.tcNavMinSat)
+                [navMaskPrr, prrOutlierCenterMps, prrOutlierSigmaMps, prrOutlierGateMps] = ...
+                    localRejectPrrOutliers(delta_rawPdot, navMaskPrr, settings.tcNavMinSat, ...
+                    settings.insTakeoverPrrOutlierMadScale, settings.insTakeoverPrrOutlierAbsMps, ...
+                    settings.insTakeoverPrrOutlierMinMadMps, settings.insTakeoverPrrOutlierMaxIter);
+            end
+            prrUsedSatNum = nnz(navMaskPrr);
+            prrRejectedSatNum = max(0, prrCandidateSatNum - prrUsedSatNum);
+            prrRejectRatio = 0;
+            if prrCandidateSatNum > 0
+                prrRejectRatio = prrRejectedSatNum / prrCandidateSatNum;
+            end
+            if applyPrrOutlierReject && (prrRejectRatio > settings.insTakeoverPrrMaxRejectRatio)
+                navMaskPrr(:) = false;
+                prrUsedSatNum = 0;
+            end
             if any(navMaskPrr)
                 Hprr = localBuildRangeRateModel(LOSRate(navMaskPrr, :), CenRate, numel(kf.xk));
+                if modeClockHold && settings.clockSpoofDecoupleClockStates && (size(Hprr,2) >= 1)
+                    Hprr(:, end) = 0;
+                end
                 Rprr = localBuildRangeRateCov(elRate(navMaskPrr), prrNoiseStd);
                 if modeInsTakeover
+                    prrFbStr = settings.takeoverPrrFeedbackStr;
+                elseif modeGnssRamp && settings.gnssRampUseSuppressedPrr
                     prrFbStr = settings.takeoverPrrFeedbackStr;
                 else
                     prrFbStr = settings.trustedGnssFeedbackStr;
                 end
+                yPrr = delta_rawPdot(navMaskPrr);
+                if modeInsTakeover && isfinite(settings.insTakeoverPrrInnovationClipMps) && (settings.insTakeoverPrrInnovationClipMps > 0)
+                    clipPrr = settings.insTakeoverPrrInnovationClipMps;
+                    yPrr = min(max(yPrr, -clipPrr), clipPrr);
+                elseif isfinite(settings.tcRangeRateInnovationClipMps) && (settings.tcRangeRateInnovationClipMps > 0)
+                    clipPrr = settings.tcRangeRateInnovationClipMps;
+                    yPrr = min(max(yPrr, -clipPrr), clipPrr);
+                end
                 [kf, ins, prrUpdateUsed, ~] = localGuardedMeasurementUpdate( ...
-                    kf, ins, delta_rawPdot(navMaskPrr), Hprr, Rprr, 'M', prrFbStr, settings);
+                    kf, ins, yPrr, Hprr, Rprr, 'M', prrFbStr, settings);
             else
                 prrUpdateUsed = false;
             end
@@ -709,14 +989,15 @@ for currMeasNr = 1 : roundTime
         end
     end
 
-    if modeInsTakeover
-        if settings.virtualZUPTEnable
+    applyTakeoverConstraints = modeInsTakeover || modeClockHold;
+    if applyTakeoverConstraints
+        if modeInsTakeover && settings.virtualZUPTEnable
             [kf, ins, modeVirtualZUPT, zuptResidualN, zuptFailCode] = localApplyVirtualZUPT(kf, ins, settings);
             if (~modeVirtualZUPT) && (zuptFailCode > 0) && (qualityFallbackCode == 0)
                 qualityFallbackCode = zuptFailCode;
             end
         end
-        if settings.virtualPitchRollHoldEnable
+        if modeInsTakeover && settings.virtualPitchRollHoldEnable
             [kf, ins, modeVirtualPitchRollHold, pitchRollResidualRad, attFailCode] = localApplyVirtualPitchRollHold(kf, ins, takeoverPitchRollRefRad, settings);
             if (~modeVirtualPitchRollHold) && (attFailCode > 0) && (qualityFallbackCode == 0)
                 qualityFallbackCode = attFailCode;
@@ -734,18 +1015,26 @@ for currMeasNr = 1 : roundTime
                 qualityFallbackCode = heightFailCode;
             end
         end
-        if settings.virtualNHCEnable
+        if modeInsTakeover && settings.virtualNHCEnable
             [kf, ins, modeVirtualNHC, nhcResidualBody, nhcFailCode] = localApplyVirtualNHC(kf, ins, settings);
             if (~modeVirtualNHC) && (nhcFailCode > 0) && (qualityFallbackCode == 0)
                 qualityFallbackCode = nhcFailCode;
             end
         end
-        if settings.virtualSpeedHoldEnable && ~modeVirtualZUPT
+        if modeInsTakeover && settings.virtualSpeedHoldEnable && ~modeVirtualZUPT
             [kf, ins, modeVirtualSpeedHold, speedHoldResidual, speedFailCode] = localApplyVirtualSpeedHold(kf, ins, takeoverForwardSpeedRefMps, settings);
             if (~modeVirtualSpeedHold) && (speedFailCode > 0) && (qualityFallbackCode == 0)
                 qualityFallbackCode = speedFailCode;
             end
         end
+    end
+
+    planarClampActive = modeClockHold && settings.clockHoldPlanarClampEnable && ...
+                       (metricCommonHz >= settings.clockHoldPlanarClampCommonHz || ...
+                        metricDiffHz >= settings.clockHoldPlanarClampDiffHz);
+    if planarClampActive && isfinite(takeoverHeightRefM)
+        ins.vn(3) = 0;
+        ins.pos(3) = takeoverHeightRefM;
     end
 
     kinResidualNorm = 0;
@@ -766,6 +1055,7 @@ for currMeasNr = 1 : roundTime
     navResults.modeInsOnly(1, currMeasNr) = modeInsTakeover;
     navResults.modeInsTakeover(1, currMeasNr) = modeInsTakeover;
     navResults.modeGnssRamp(1, currMeasNr) = modeGnssRamp;
+    navResults.modeClockHold(1, currMeasNr) = modeClockHold;
     navResults.modeKinConstraint(1, currMeasNr) = modeVirtualNHC || modeVirtualZUPT || modeVirtualSpeedHold || modeVirtualHeightHold || modeVirtualPitchRollHold || modeVirtualVertVelHold;
     navResults.modeVirtualNHC(1, currMeasNr) = modeVirtualNHC;
     navResults.modeVirtualZUPT(1, currMeasNr) = modeVirtualZUPT;
@@ -774,13 +1064,19 @@ for currMeasNr = 1 : roundTime
     navResults.modeVirtualPitchRollHold(1, currMeasNr) = modeVirtualPitchRollHold;
     navResults.modeVirtualVertVelHold(1, currMeasNr) = modeVirtualVertVelHold;
     navResults.modeTakeoverPrrAssist(1, currMeasNr) = modeTakeoverPrrAssist;
+    navResults.takeoverPrrAssistWeight(1, currMeasNr) = takeoverPrrAssistWeight;
     navResults.kinCorrectionNorm(1, currMeasNr) = kinResidualNorm;
 
     navResults.spoofFlag(1, currMeasNr) = ~modeNormal;
     navResults.spoofAlarm(1, currMeasNr) = alarmRaised;
     navResults.recoveryCandidate(1, currMeasNr) = releaseStable;
     navResults.recoveryCounter(1, currMeasNr) = releaseCounter;
-    navResults.modeState(1, currMeasNr) = navMode;
+    navResults.recoveryForced(1, currMeasNr) = recoveryForced;
+    if modeClockHold
+        navResults.modeState(1, currMeasNr) = MODE_CLOCK_HOLD;
+    else
+        navResults.modeState(1, currMeasNr) = navMode;
+    end
 
     navResults.dopplerGpsMeasHz(:, currMeasNr) = dopplerMeasHz;
     navResults.dopplerInsPredHz(:, currMeasNr) = dopplerPredRawHz;
@@ -810,6 +1106,13 @@ for currMeasNr = 1 : roundTime
     navResults.gnssUpdateUsed(1, currMeasNr) = gnssUpdateUsed;
     navResults.gnssWeightScalePr(1, currMeasNr) = gnssPrScale;
     navResults.gnssWeightScalePrr(1, currMeasNr) = gnssPrrScale;
+    navResults.prrCandidateSatNum(1, currMeasNr) = prrCandidateSatNum;
+    navResults.prrUsedSatNum(1, currMeasNr) = prrUsedSatNum;
+    navResults.prrRejectedSatNum(1, currMeasNr) = prrRejectedSatNum;
+    navResults.prrOutlierCenterMps(1, currMeasNr) = prrOutlierCenterMps;
+    navResults.prrOutlierSigmaMps(1, currMeasNr) = prrOutlierSigmaMps;
+    navResults.prrOutlierGateMps(1, currMeasNr) = prrOutlierGateMps;
+    navResults.prrRejectRatio(1, currMeasNr) = prrRejectRatio;
 
     if modeGnssRamp
         if rampCounter >= rampEpochs
@@ -851,6 +1154,7 @@ for currMeasNr = 1 : roundTime
         end
         wvm = trj.imu(k:k1,1:6);  t = trj.imu(k1,end);
         ins = insupdate(ins, wvm);
+        insShadow = insupdate(insShadow, wvm);
         kf.Phikk_1 = kffk(ins);
         kf = kfupdate(kf);
         k = k + nn;
@@ -917,12 +1221,15 @@ if stopEpoch < roundTime
 end
 
 if spoofStartEpoch > 0
-    fprintf('[ALARM] INS takeover entered at epoch %d.\n', spoofStartEpoch);
+    fprintf('[ALARM] Spoof mitigation entered at epoch %d.\n', spoofStartEpoch);
 else
     disp('[INFO] No spoofing alarm triggered during this run.');
 end
 if any(navResults.modeGnssRamp)
     fprintf('[INFO] GNSS ramp epochs = %d\n', sum(navResults.modeGnssRamp));
+end
+if any(navResults.recoveryForced)
+    fprintf('[INFO] Forced probe ramps = %d\n', sum(navResults.recoveryForced));
 end
 if any(navResults.modeVirtualNHC)
     fprintf('[INFO] Virtual NHC epochs = %d\n', sum(navResults.modeVirtualNHC));
@@ -937,6 +1244,12 @@ if any(navResults.qualityFallback)
         sum(navResults.qualityFallbackCode == 2), ...
         sum(navResults.qualityFallbackCode == 5), ...
         sum(navResults.qualityFallbackCode == 6));
+end
+if any(navResults.prrRejectedSatNum > 0)
+    fprintf('[INFO] PRR outlier rejects = %d sats over %d epochs (max per epoch = %d).\n', ...
+        sum(navResults.prrRejectedSatNum), ...
+        sum(navResults.prrRejectedSatNum > 0), ...
+        max(navResults.prrRejectedSatNum));
 end
 
 %% Quick result plots (skip invalid first solution)
@@ -977,6 +1290,37 @@ switch policy
                   ((metricCommonHz - metricDiffHz) <= settings.insTakeoverPrrAssistMcmOverDiffMarginHz);
     otherwise
         allowed = true;
+end
+end
+
+function weight = localTakeoverPrrAssistWeight(metricCommonHz, metricDiffHz, settings)
+policy = lower(strtrim(settings.insTakeoverPrrAssistPolicy));
+switch policy
+    case 'off'
+        weight = 0;
+    case 'conditional'
+        if localTakeoverPrrAssistAllowed(metricCommonHz, metricDiffHz, settings)
+            weight = 1;
+        else
+            weight = 0;
+        end
+    case 'continuous'
+        minW = max(0, min(1, settings.insTakeoverPrrAssistMinWeight));
+        if ~isfinite(metricCommonHz) || ~isfinite(metricDiffHz)
+            weight = minW;
+            return;
+        end
+        diffRef = max(settings.insTakeoverPrrAssistDiffRefHz, 1e-3);
+        diffConf = min(max(metricDiffHz / diffRef, 0), 1);
+        dom = metricCommonHz - metricDiffHz;
+        domLo = settings.insTakeoverPrrAssistFullWeightMarginHz;
+        domHi = max(domLo + 1e-3, settings.insTakeoverPrrAssistZeroWeightMarginHz);
+        domPenalty = min(max((dom - domLo) / (domHi - domLo), 0), 1);
+        domConf = 1 - domPenalty;
+        weight = minW + (1 - minW) * diffConf * domConf;
+        weight = max(minW, min(1, weight));
+    otherwise
+        weight = 1;
 end
 end
 
@@ -1060,6 +1404,57 @@ if nnz(navMask) < minSat
 end
 end
 
+function [maskOut, centerMps, sigmaMps, gateMps] = localRejectPrrOutliers(residual, maskIn, minSat, madScale, absGateMps, minMadMps, maxIter)
+maskOut = logical(maskIn(:));
+residual = residual(:);
+centerMps = nan;
+sigmaMps = nan;
+gateMps = nan;
+if nnz(maskOut) < minSat
+    return;
+end
+if nargin < 7 || isempty(maxIter) || ~isfinite(maxIter) || (maxIter < 1)
+    maxIter = 1;
+end
+if nargin < 6 || isempty(minMadMps) || ~isfinite(minMadMps)
+    minMadMps = 0.03;
+end
+if nargin < 5 || isempty(absGateMps)
+    absGateMps = inf;
+end
+if nargin < 4 || isempty(madScale) || ~isfinite(madScale) || (madScale <= 0)
+    madScale = 4.0;
+end
+
+for iter = 1:maxIter
+    idx = find(maskOut);
+    if numel(idx) < minSat
+        break;
+    end
+    v = residual(idx);
+    centerMps = median(v, 'omitnan');
+    madVal = median(abs(v - centerMps), 'omitnan');
+    sigmaMps = max(1.4826 * madVal, minMadMps);
+    gateMps = min(absGateMps, madScale * sigmaMps);
+    if ~isfinite(gateMps)
+        gateMps = madScale * sigmaMps;
+    end
+    if ~isfinite(gateMps) || (gateMps <= 0)
+        break;
+    end
+    keep = abs(v - centerMps) <= gateMps;
+    if all(keep)
+        break;
+    end
+    if sum(keep) < minSat
+        break;
+    end
+    newMask = false(size(maskOut));
+    newMask(idx(keep)) = true;
+    maskOut = newMask;
+end
+end
+
 function kf = localSetMeasurementModel(kf, Hk, Rk)
 [kf.m, n] = size(Hk);
 if n ~= numel(kf.xk)
@@ -1070,6 +1465,20 @@ kf.Rk = Rk;
 kf.Kk = zeros(numel(kf.xk), kf.m);
 kf.measstop = zeros(kf.m, 1);
 kf.measlost = zeros(kf.m, 1);
+end
+
+function kf = localResetTakeoverState(kf, settings)
+if ~isfield(kf, 'xk') || isempty(kf.xk)
+    return;
+end
+n = numel(kf.xk);
+idxNav = 1 : min(9, n);
+if settings.spoofTakeoverResetNavState
+    kf.xk(idxNav) = 0;
+end
+if settings.spoofTakeoverResetClockState && (n >= 2)
+    kf.xk(n-1:n) = 0;
+end
 end
 
 function [kf, ins, used, failCode] = localGuardedMeasurementUpdate(kf, ins, yk, Hk, Rk, measMode, fbstr, settings)
