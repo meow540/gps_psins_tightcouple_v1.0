@@ -1,18 +1,18 @@
 function  [trackans, I_P, Q_P] = perChannelTrackOnce_DeepIn(trackans, settings, fid, dppl, delta_dppl)
-%% Ä³Í¨µÀ½øĞĞÒ»´ÎÏà¸É»ı·Ö£¬ºÍÔ­±¾µÄtrackingº¯ÊıÎŞÇø±ğ
+%% æŸé€šé“è¿›è¡Œä¸€æ¬¡ç›¸å¹²ç§¯åˆ†ï¼Œå’ŒåŸæœ¬çš„trackingå‡½æ•°æ— åŒºåˆ«
 %
-% ÊäÈë²ÎÊı:
-%        - trackans: Ò»¸öÍ¨µÀµÄ¸ú×Ù½á¹¹Ìå
-%        - settings: ½ÓÊÕ»úÏà¹Ø²ÎÊı
-%        - fid: ÖĞÆµÊı¾İÎÄ¼ş
-%        - dppl: ÉÏÒ»Ê±¿Ì¹ßµ¼·´À¡µÄÆµÂÊÖµ
-%        - delta_dppl: µ±Ç°¹ßµ¼·´À¡Á¿¼õÈ¥ÉÏÒ»Ê±¿Ì¹ßµ¼µÄ·´À¡Á¿[Hz]
+% è¾“å…¥å‚æ•°:
+%        - trackans: ä¸€ä¸ªé€šé“çš„è·Ÿè¸ªç»“æ„ä½“
+%        - settings: æ¥æ”¶æœºç›¸å…³å‚æ•°
+%        - fid: ä¸­é¢‘æ•°æ®æ–‡ä»¶
+%        - dppl: ä¸Šä¸€æ—¶åˆ»æƒ¯å¯¼åé¦ˆçš„é¢‘ç‡å€¼
+%        - delta_dppl: å½“å‰æƒ¯å¯¼åé¦ˆé‡å‡å»ä¸Šä¸€æ—¶åˆ»æƒ¯å¯¼çš„åé¦ˆé‡[Hz]
 %
-% è¾“å‡ºå‚æ•°:
-%        - trackans: ¸ú×Ù½á¹¹Ìå
+% æˆæ’³åš­é™å‚›æšŸ:
+%        - trackans: è·Ÿè¸ªç»“æ„ä½“
 %
 %--------------------------------------------------------------------------
-%% åˆå§‹åŒ–ä¸€äº›å˜é‡?
+%% é’æ¿†îé–æ ¦ç«´æµœæ¶˜å½‰é–²?
 %--- DLL variables --------------------------------------------------------
 % Define early-late offset (in chips)
 earlyLateSpc = settings.dllCorrelatorSpacing;
@@ -21,6 +21,9 @@ earlyLateSpc = settings.dllCorrelatorSpacing;
 PDIcode = 0.001;
 
 % Calculate filter coefficient values
+if ~isfield(settings, 'dllGain')
+    settings.dllGain = 1;
+end
 [tau1code, tau2code] = calcLoopCoef(settings.dllNoiseBandwidth, ...
                                     settings.dllDampingRatio, ...
                                     settings.dllGain);
@@ -29,12 +32,24 @@ PDIcode = 0.001;
 % Summation interval
 PDIcarr = 0.001;
 
+% Select effective PLL bandwidth by deep-coupling mode.
+deepModeState = 0;
+if isfield(settings, 'deepModeState')
+    deepModeState = settings.deepModeState;
+end
+pllBw = settings.pllNoiseBandwidth;
+if deepModeState == 1 && isfield(settings, 'deepPllNoiseBandwidthSuspect')
+    pllBw = settings.deepPllNoiseBandwidthSuspect;
+elseif deepModeState == 2 && isfield(settings, 'deepPllNoiseBandwidthSpoof')
+    pllBw = settings.deepPllNoiseBandwidthSpoof;
+end
+
 % Calculate filter coefficient values
-[tau1carr, tau2carr] = calcLoopCoef(settings.pllNoiseBandwidth, ...
+[tau1carr, tau2carr] = calcLoopCoef(pllBw, ...
                                     settings.pllDampingRatio, ...
                                     0.25);
 
-% Move the starting point of processing. skipNumberOfBytes å·²ç»ç®—åœ¨SamplePosä¸­äº†ï¼Œä¸å¿…å†æ¬¡è®¡ç®?
+% Move the starting point of processing. skipNumberOfBytes å®¸èŒ¬ç²¡ç» æ¥€æ¹ªSamplePosæ¶“î…ç°¡é”›å±¼ç¬‰è¹‡å‘­å•€å¨†Â¤î…¸ç» ?
 fseek(fid, settings.fileType * settings.dataFormat * (trackans.SamplePos), 'bof');
 
 %--------------------------------------------------------------------------
@@ -60,8 +75,12 @@ oldCodeError = trackans.codeError;
 % carrier/Costas loop parameters
 oldCarrNco   = trackans.carrNco;
 oldCarrError = trackans.carrError;
+prevModeState = 0;
+if isfield(trackans, 'deepPrevMode')
+    prevModeState = trackans.deepPrevMode;
+end
 
-%% å¼?å§‹è·Ÿè¸?
+%% å¯®?æ¿®å¬­çª¡éŸª?
 % Find the size of a "block" or code period in whole samples
 codePhaseStep = codeFreq / settings.samplingFreq;            
 blksize = ceil((settings.codeLength - remCodePhase) / codePhaseStep);
@@ -131,15 +150,61 @@ Q_L = sum(lateCode   .* qBasebandSignal);
 % Implement carrier loop discriminator (phase detector)
 carrError = atan(Q_P / I_P) / (2.0 * pi);
 
+% State transition smoothing: align/soften internal loop state on spoof entry.
+if deepModeState == 2 && prevModeState < 2
+    if ~isfield(settings, 'deepAlignCarrNcoOnSpoof'), settings.deepAlignCarrNcoOnSpoof = 1; end
+    if settings.deepAlignCarrNcoOnSpoof
+        if ~isfield(settings, 'deepAidWeight'), settings.deepAidWeight = 1.0; end
+        if ~isfield(settings, 'deepClkWeight'), settings.deepClkWeight = 1.0; end
+        if ~isfield(settings, 'deepClkDriftHz'), settings.deepClkDriftHz = 0.0; end
+        oldCarrNco = settings.deepAidWeight * dppl + settings.deepClkWeight * settings.deepClkDriftHz;
+    end
+    if ~isfield(settings, 'deepResetCarrErrorOnSpoof'), settings.deepResetCarrErrorOnSpoof = 1; end
+    if settings.deepResetCarrErrorOnSpoof
+        oldCarrError = 0;
+    end
+end
+
+% Downweight or freeze discriminator contribution in suspect/spoof mode.
+if ~isfield(settings, 'deepCarrErrorScaleSuspect'), settings.deepCarrErrorScaleSuspect = 0.5; end
+if ~isfield(settings, 'deepCarrErrorScaleSpoof'), settings.deepCarrErrorScaleSpoof = 0.1; end
+if deepModeState == 1
+    carrError = carrError * settings.deepCarrErrorScaleSuspect;
+elseif deepModeState == 2
+    if ~isfield(settings, 'deepFreezeCarrErrorInSpoof'), settings.deepFreezeCarrErrorInSpoof = 0; end
+    if settings.deepFreezeCarrErrorInSpoof
+        carrError = 0;
+    else
+        carrError = carrError * settings.deepCarrErrorScaleSpoof;
+    end
+end
+
 % Implement carrier loop filter and generate NCO command
 carrNco = oldCarrNco + (tau2carr/tau1carr) * ...
     (carrError - oldCarrError) + carrError * (PDIcarr/tau1carr);
 % oldCarrNco   = carrNco;
 % oldCarrError = carrError;
 
-% Modify carrier freq based on NCO command; something has been changed here
-% carrFreq = carrFreqBasis + carrNco;
-carrFreq = carrNco + settings.IF + dppl + delta_dppl / 20;  % ½öÔÚ´Ë´¦½øĞĞÁË¸Ä¶¯
+% Modify carrier frequency based on PLL output + INS aid + clock-drift aid.
+if ~isfield(settings, 'deepInterpDiv'), settings.deepInterpDiv = 20; end
+if ~isfield(settings, 'deepAidWeight'), settings.deepAidWeight = 1.0; end
+if ~isfield(settings, 'deepClkWeight'), settings.deepClkWeight = 1.0; end
+if ~isfield(settings, 'deepClkDriftHz'), settings.deepClkDriftHz = 0.0; end
+if ~isfield(settings, 'deepCarrNcoStepLimitHz'), settings.deepCarrNcoStepLimitHz = inf; end
+
+% Optional carrier-NCO step clipping to avoid abrupt loop transients.
+if isfinite(settings.deepCarrNcoStepLimitHz)
+    dn = carrNco - oldCarrNco;
+    if dn > settings.deepCarrNcoStepLimitHz
+        carrNco = oldCarrNco + settings.deepCarrNcoStepLimitHz;
+    elseif dn < -settings.deepCarrNcoStepLimitHz
+        carrNco = oldCarrNco - settings.deepCarrNcoStepLimitHz;
+    end
+end
+
+aidFreqNow = dppl + delta_dppl / max(1, settings.deepInterpDiv);
+carrFreq = settings.IF + carrNco + settings.deepAidWeight * aidFreqNow + ...
+           settings.deepClkWeight * settings.deepClkDriftHz;
 
 trackans.carrFreq = carrFreq;   
 
@@ -163,6 +228,7 @@ trackans.codeError          = codeError;
 trackans.codeNco            = codeNco;
 trackans.carrError          = carrError;
 trackans.carrNco            = carrNco;
+trackans.deepPrevMode       = deepModeState;
 
 trackans.remCodePhase       = remCodePhase;
 trackans.remCarrPhase       = remCarrPhase;
