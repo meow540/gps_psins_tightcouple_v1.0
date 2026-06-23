@@ -1,4 +1,4 @@
-function navSolut = postNavTight(trackDeepIn, settings, eph, TOW)
+function navSolut = postNavTight(trackDeepIn, settings, eph, TOW, sampleClockBaseRefIn)
 %% GNSS紧组合数据准备（不对仰角进行限制）
 %
 % 输入参数:
@@ -26,9 +26,28 @@ rawP = zeros(1, numActChnList);
 doppler = zeros(1, numActChnList);
 remSampleNum = zeros(1, numActChnList);
 totalSampleNum = zeros(1, numActChnList);
+codePhaseCorrChips = zeros(1, numActChnList);
+codePhaseTaoList = zeros(1, numActChnList);
+numCoIntList = zeros(1, numActChnList);
+samplePosList = zeros(1, numActChnList);
+recvTimeList = zeros(1, numActChnList);
+recvTimeNormList = zeros(1, numActChnList);
+sampleClockBaseList = zeros(1, numActChnList);
+sampleClockErrSamp = zeros(1, numActChnList);
 
 for ii = 1 : numActChnList
-    remSampleNum(ii) = fix((settings.recvTime - trackDeepIn(ii).recvTime) * settings.samplingFreq);
+    sampleClockBaseList(ii) = trackDeepIn(ii).recvTime - trackDeepIn(ii).SamplePos / settings.samplingFreq;
+end
+if nargin >= 5 && ~isempty(sampleClockBaseRefIn) && isfinite(sampleClockBaseRefIn)
+    sampleClockBaseRef = sampleClockBaseRefIn;
+else
+    sampleClockBaseRef = median(sampleClockBaseList, 'omitnan');
+end
+
+for ii = 1 : numActChnList
+    recvTimeNormList(ii) = sampleClockBaseRef + trackDeepIn(ii).SamplePos / settings.samplingFreq;
+    sampleClockErrSamp(ii) = (trackDeepIn(ii).recvTime - recvTimeNormList(ii)) * settings.samplingFreq;
+    remSampleNum(ii) = round((settings.recvTime - recvTimeNormList(ii)) * settings.samplingFreq);
     totalSampleNum(ii) = trackDeepIn(ii).SamplePos + remSampleNum(ii);  
 end
 
@@ -42,6 +61,16 @@ for ii = 1 : numActChnList
     num_Cyclic = trackDeepIn(ii).numOfCoInt;
 
     codePhaseTao = trackDeepIn(ii).remCodePhase + codePhaseStep * ( remSampleNum(ii) - 1 );  % -1?
+    if isfield(settings, 'deepCodeReacqNavCorrEnable') && settings.deepCodeReacqNavCorrEnable && ...
+            isfield(trackDeepIn(ii), 'deepCodePhaseCorrChips') && ...
+            isfinite(trackDeepIn(ii).deepCodePhaseCorrChips)
+        codePhaseCorrChips(ii) = trackDeepIn(ii).deepCodePhaseCorrChips;
+        codePhaseTao = codePhaseTao + codePhaseCorrChips(ii);
+    end
+    codePhaseTaoList(ii) = codePhaseTao;
+    numCoIntList(ii) = num_Cyclic;
+    samplePosList(ii) = trackDeepIn(ii).SamplePos;
+    recvTimeList(ii) = trackDeepIn(ii).recvTime;
 
     launchTime(ii) = TOW + num_Cyclic * 1e-3 + codePhaseTao / 1023 * 1e-3;   % [s]
 
@@ -59,5 +88,19 @@ rawP_dot = -doppler .* settings.c / 1575.42e6;
 navSolut.rawP = rawP;  navSolut.rawP_dot = rawP_dot;  
 navSolut.satClkCorr = satClkCorr;  navSolut.satClkDrift = satClkDrift;  navSolut.satPositions = satPositions;
 navSolut.satVelocity = satVelocity;
+navSolut.codePhaseCorrChips = codePhaseCorrChips;
+navSolut.rawPCorrM = -codePhaseCorrChips / 1023 * 1e-3 * settings.c;
+navSolut.launchTime = launchTime;
+navSolut.codePhaseTao = codePhaseTaoList;
+navSolut.remSampleNum = remSampleNum;
+navSolut.totalSampleNum = totalSampleNum;
+navSolut.numOfCoInt = numCoIntList;
+navSolut.samplePos = samplePosList;
+navSolut.trackRecvTime = recvTimeList;
+navSolut.trackRecvTimeNorm = recvTimeNormList;
+navSolut.sampleClockBase = sampleClockBaseList;
+navSolut.sampleClockErrSamples = sampleClockErrSamp;
+navSolut.pseudorangeMs = rawP / settings.c / 1e-3;
+navSolut.pseudorangeModuloMs = mod(rawP / settings.c, 1e-3) / 1e-3;
 
 end
