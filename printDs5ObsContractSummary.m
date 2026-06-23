@@ -14,6 +14,9 @@ printBoolCount(R, 'shadowDs5ObsContractTrackingPass', mask, 'obsContractTracking
 printBoolCount(R, 'shadowDs5ObsContractCommonClockPass', mask, 'obsContractCommonClockPass');
 printBoolCount(R, 'shadowDs5ObsContractSpreadPass', mask, 'obsContractSpreadPass');
 printBoolCount(R, 'shadowDs5ObsContractBaseSeedPass', mask, 'obsContractBaseSeedPass');
+if isfield(R, 'shadowDs5ObsContractStrictRawIndependentPass')
+    printBoolCount(R, 'shadowDs5ObsContractStrictRawIndependentPass', mask, 'strictRawIndependentPass');
+end
 printBoolCount(R, 'shadowDs5RefObsTrackRawSampled', mask, 'refObsTrackRawSampled');
 printBoolCount(R, 'shadowDs5RefObsTrackCoasted', mask, 'refObsTrackCoasted');
 printBoolCount(R, 'shadowDs5RefObsRecoveryPass', mask, 'refObsRecoveryPass');
@@ -40,6 +43,14 @@ printBoolCount(R, 'shadowFinalObsContractBaseSeedHold', mask, 'finalObsContractB
 printNumSummary(R, 'shadowDs5ObsContractSpreadP95M', mask, 'obsContract spreadP95 m');
 printNumSummary(R, 'shadowDs5ObsContractCommonClockM', mask, 'obsContract commonClock m');
 printNumSummary(R, 'shadowDs5ObsContractBaseSeedFrac', mask, 'obsContract effectiveBaseSeedFrac');
+if isfield(R, 'shadowDs5ObsContractStrictRawIndependentSatNum')
+    printNumSummary(R, 'shadowDs5ObsContractStrictRawIndependentSatNum', mask, 'strictRawIndependent sat');
+    printNumSummary(R, 'shadowDs5ObsContractRawSampledUsedSatNum', mask, 'strictRaw rawSampledUsed sat');
+    printNumSummary(R, 'shadowDs5ObsContractRawNonCoastedUsedSatNum', mask, 'strictRaw rawNonCoastedUsed sat');
+    printNumSummary(R, 'shadowDs5ObsContractNoBaseSeedUsedSatNum', mask, 'strictRaw noBaseSeedUsed sat');
+    printNumSummary(R, 'shadowDs5ObsContractQualityIndependentSatNum', mask, 'strictRaw qualityIndependent sat');
+end
+printStrictRawIndependentDerived(R, mask);
 printNumSummary(R, 'shadowDs5RefObsPosRawAnchorLiftSpreadP95M', mask, 'refObs rawAnchorLift spreadP95 m');
 printNumSummary(R, 'shadowDs5RefObsPosPostfitRmsM', mask, 'refObs position postfitRms m');
 printNumSummary(R, 'shadowDs5RefObsPosCorrM', mask, 'refObs position corr m');
@@ -53,6 +64,57 @@ printNumSummary(R, 'shadowRecoveredFilterBaselineDiffM', mask, 'recoveredFilter 
 printNumSummary(R, 'shadowFinalOutputRecoveryBaselineDiffM', mask, 'finalOutput recoveryBaselineDiff m');
 printNumSummary(R, 'shadowFinalOutputContinuityDiffM', mask, 'finalOutput continuityDiff m');
 printFinalSourceCounts(R, mask);
+end
+
+function printStrictRawIndependentDerived(R, mask)
+requiredFields = {'shadowDs5RefObsUsed', 'shadowDs5RefObsTrackRawSampled', ...
+    'shadowDs5RefObsTrackCoasted', 'shadowDs5RefObsSeedUseBase', ...
+    'shadowDs5RefObsCodeErrChips', 'shadowDs5RefObsFreqErrHz'};
+for ii = 1:numel(requiredFields)
+    if ~isfield(R, requiredFields{ii})
+        return;
+    end
+end
+
+idx = find(mask);
+maxCol = min([numel(mask), size(R.shadowDs5RefObsUsed, 2), ...
+    size(R.shadowDs5RefObsTrackRawSampled, 2), size(R.shadowDs5RefObsTrackCoasted, 2), ...
+    size(R.shadowDs5RefObsSeedUseBase, 2), size(R.shadowDs5RefObsCodeErrChips, 2), ...
+    size(R.shadowDs5RefObsFreqErrHz, 2)]);
+idx = idx(idx <= maxCol);
+if isempty(idx)
+    fprintf('strictRawIndependentMin4 derived: no samples\n');
+    return;
+end
+
+used = logical(R.shadowDs5RefObsUsed(:, idx));
+rawSampled = logical(R.shadowDs5RefObsTrackRawSampled(:, idx));
+coasted = logical(R.shadowDs5RefObsTrackCoasted(:, idx));
+seedUseBase = logical(R.shadowDs5RefObsSeedUseBase(:, idx));
+codeErr = abs(R.shadowDs5RefObsCodeErrChips(:, idx));
+freqErr = abs(R.shadowDs5RefObsFreqErrHz(:, idx));
+
+quality = used & ~seedUseBase & isfinite(codeErr) & codeErr <= 1.60 & ...
+    isfinite(freqErr) & freqErr <= 350.0;
+if isfield(R, 'shadowDs5TrueRefReady') && size(R.shadowDs5TrueRefReady, 2) >= max(idx)
+    quality = quality & logical(R.shadowDs5TrueRefReady(:, idx));
+end
+if isfield(R, 'shadowDs5RefObsTrackDriven') && size(R.shadowDs5RefObsTrackDriven, 2) >= max(idx)
+    quality = quality & logical(R.shadowDs5RefObsTrackDriven(:, idx));
+end
+if isfield(R, 'shadowRawTrackCodeRefNcoPullHz') && size(R.shadowRawTrackCodeRefNcoPullHz, 2) >= max(idx)
+    quality = quality & isfinite(R.shadowRawTrackCodeRefNcoPullHz(:, idx));
+end
+if isfield(R, 'shadowRawTrackPromptIP') && size(R.shadowRawTrackPromptIP, 2) >= max(idx)
+    quality = quality & isfinite(R.shadowRawTrackPromptIP(:, idx));
+end
+
+minSat = 4;
+strictRaw = quality & rawSampled & ~coasted;
+fprintf('strictRawIndependentMin4 derived: %d/%d\n', nnz(sum(strictRaw, 1) >= minSat), numel(idx));
+fprintf('strictRaw rawSampledUsed>=4 derived: %d/%d\n', nnz(sum(used & rawSampled, 1) >= minSat), numel(idx));
+fprintf('strictRaw rawNonCoastedUsed>=4 derived: %d/%d\n', nnz(sum(used & rawSampled & ~coasted, 1) >= minSat), numel(idx));
+fprintf('strictRaw noBaseSeedQuality>=4 derived: %d/%d\n', nnz(sum(quality, 1) >= minSat), numel(idx));
 end
 
 function printBoolCount(R, fieldName, mask, label)

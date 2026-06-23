@@ -1500,6 +1500,12 @@ navResults.shadowDs5ObsContractSpreadPass = false(1, roundTime);
 navResults.shadowDs5ObsContractBaseSeedPass = false(1, roundTime);
 navResults.shadowDs5ObsContractBaseSeedSatNum = zeros(1, roundTime);
 navResults.shadowDs5ObsContractBaseSeedFrac = nan(1, roundTime);
+navResults.shadowDs5ObsContractStrictRawIndependentPass = false(1, roundTime);
+navResults.shadowDs5ObsContractStrictRawIndependentSatNum = zeros(1, roundTime);
+navResults.shadowDs5ObsContractRawSampledUsedSatNum = zeros(1, roundTime);
+navResults.shadowDs5ObsContractRawNonCoastedUsedSatNum = zeros(1, roundTime);
+navResults.shadowDs5ObsContractNoBaseSeedUsedSatNum = zeros(1, roundTime);
+navResults.shadowDs5ObsContractQualityIndependentSatNum = zeros(1, roundTime);
 navResults.shadowDs5ObsContractUsableDeltaM = nan(numActChnList, roundTime);
 navResults.shadowDs5ObsContractResidualM = nan(numActChnList, roundTime);
 navResults.shadowDs5RefObsRecoveryPass = false(1, roundTime);
@@ -7219,11 +7225,15 @@ for ii = 1:numel(passShadowIdx)
     end
     seedDeltaM = deltaLift(ii);
     seedUseBaseNow = false;
-    if (~isfinite(seedDeltaM) || ...
-            (isfinite(baseMed) && isfinite(seedMaxDevFromBaseM) && seedMaxDevFromBaseM > 0 && isfinite(seedDeltaM) && abs(seedDeltaM - baseMed) > seedMaxDevFromBaseM)) ...
-            && useBaseFallback && isfinite(baseMed)
-        seedDeltaM = baseMed;
-        seedUseBaseNow = true;
+    seedOutlierNow = isfinite(baseMed) && isfinite(seedMaxDevFromBaseM) && seedMaxDevFromBaseM > 0 && ...
+        isfinite(seedDeltaM) && abs(seedDeltaM - baseMed) > seedMaxDevFromBaseM;
+    if ~isfinite(seedDeltaM) || seedOutlierNow
+        if useBaseFallback && isfinite(baseMed)
+            seedDeltaM = baseMed;
+            seedUseBaseNow = true;
+        else
+            continue;
+        end
     end
     if ~isfinite(seedDeltaM)
         continue;
@@ -8416,6 +8426,12 @@ spreadPass = false;
 baseSeedPass = false;
 baseSeedCnt = 0;
 baseSeedFrac = nan;
+strictRawIndependentPass = false;
+strictRawIndependentSat = 0;
+rawSampledUsedSat = 0;
+rawNonCoastedUsedSat = 0;
+noBaseSeedUsedSat = 0;
+qualityIndependentSat = 0;
 if currMeasNr > size(navResults.shadowDs5RefObsUsed, 2) || ~localUseDs5ReferenceObsModel(settings, currMeasNr)
     navResults = localStoreDs5ObservationContract(navResults, currMeasNr, tf, usedSat, commonClockM, ...
         spreadMedM, spreadP95M, trackingPass, commonClockPass, spreadPass, baseSeedPass, ...
@@ -8440,9 +8456,6 @@ if usedSat > 0
         seedUseBase = navResults.shadowDs5RefObsSeedUseBase(:, currMeasNr) ~= 0;
     end
     independentTracking = valid(:);
-    if isfield(navResults, 'shadowDs5TrueRefReady') && currMeasNr <= size(navResults.shadowDs5TrueRefReady, 2)
-        independentTracking = independentTracking & logical(navResults.shadowDs5TrueRefReady(:, currMeasNr));
-    end
     if isfield(navResults, 'shadowDs5RefObsTrackDriven') && currMeasNr <= size(navResults.shadowDs5RefObsTrackDriven, 2)
         independentTracking = independentTracking & logical(navResults.shadowDs5RefObsTrackDriven(:, currMeasNr));
     end
@@ -8463,6 +8476,20 @@ if usedSat > 0
     seedUseBaseEffective = seedUseBase(:) & ~independentTracking(:);
     baseSeedCnt = sum(seedUseBaseEffective(valid));
     baseSeedFrac = baseSeedCnt / max(usedSat, 1);
+    rawSampledNow = false(numCh, 1);
+    if isfield(navResults, 'shadowDs5RefObsTrackRawSampled') && currMeasNr <= size(navResults.shadowDs5RefObsTrackRawSampled, 2)
+        rawSampledNow = logical(navResults.shadowDs5RefObsTrackRawSampled(:, currMeasNr));
+    end
+    trackCoastedNow = false(numCh, 1);
+    if isfield(navResults, 'shadowDs5RefObsTrackCoasted') && currMeasNr <= size(navResults.shadowDs5RefObsTrackCoasted, 2)
+        trackCoastedNow = logical(navResults.shadowDs5RefObsTrackCoasted(:, currMeasNr));
+    end
+    rawSampledUsedSat = sum(valid(:) & rawSampledNow(:));
+    rawNonCoastedUsedSat = sum(valid(:) & rawSampledNow(:) & ~trackCoastedNow(:));
+    noBaseSeedUsedSat = sum(valid(:) & ~seedUseBase(:));
+    qualityIndependentSat = sum(valid(:) & independentTracking(:) & ~seedUseBase(:));
+    strictRawIndependentSat = sum(valid(:) & rawSampledNow(:) & ~trackCoastedNow(:) & ...
+        independentTracking(:) & ~seedUseBase(:));
     prnUse = nan(numel(validIdx), 1);
     if isfield(navResults, 'prnList') && numel(navResults.prnList) >= max(validIdx)
         prnUse = double(navResults.prnList(validIdx));
@@ -8524,6 +8551,7 @@ if usedSat > 0
         maxBaseSeedFrac = 0;
     end
     baseSeedPass = isfinite(baseSeedFrac) && (~isfinite(maxBaseSeedFrac) || maxBaseSeedFrac < 0 || baseSeedFrac <= maxBaseSeedFrac);
+    strictRawIndependentPass = strictRawIndependentSat >= minSat;
     requireTracking = localGetSettingValue(settings, 'deepShadowDs5ObsContractRequireTrackingPass', 1) ~= 0;
     tf = usedSat >= minSat && commonClockPass && spreadPass && baseSeedPass && ...
         ((~requireTracking) || trackingPass);
@@ -8531,6 +8559,12 @@ end
 navResults = localStoreDs5ObservationContract(navResults, currMeasNr, tf, usedSat, commonClockM, ...
     spreadMedM, spreadP95M, trackingPass, commonClockPass, spreadPass, baseSeedPass, ...
     baseSeedCnt, baseSeedFrac, usableDeltaAll, residualAll);
+navResults.shadowDs5ObsContractStrictRawIndependentPass(1, currMeasNr) = strictRawIndependentPass;
+navResults.shadowDs5ObsContractStrictRawIndependentSatNum(1, currMeasNr) = strictRawIndependentSat;
+navResults.shadowDs5ObsContractRawSampledUsedSatNum(1, currMeasNr) = rawSampledUsedSat;
+navResults.shadowDs5ObsContractRawNonCoastedUsedSatNum(1, currMeasNr) = rawNonCoastedUsedSat;
+navResults.shadowDs5ObsContractNoBaseSeedUsedSatNum(1, currMeasNr) = noBaseSeedUsedSat;
+navResults.shadowDs5ObsContractQualityIndependentSatNum(1, currMeasNr) = qualityIndependentSat;
 end
 
 function navResults = localStoreDs5ObservationContract(navResults, currMeasNr, tf, usedSat, commonClockM, spreadMedM, spreadP95M, trackingPass, commonClockPass, spreadPass, baseSeedPass, baseSeedCnt, baseSeedFrac, usableDeltaAll, residualAll)
