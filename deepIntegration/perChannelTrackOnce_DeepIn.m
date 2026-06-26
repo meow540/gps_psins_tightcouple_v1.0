@@ -50,7 +50,26 @@ end
                                     0.25);
 
 % Move the starting point of processing. skipNumberOfBytes 宸茬粡绠楀湪SamplePos涓簡锛屼笉蹇呭啀娆¤绠?
-fseek(fid, settings.fileType * settings.dataFormat * (trackans.SamplePos), 'bof');
+sampleBytes = settings.fileType * settings.dataFormat;
+if ~isfinite(sampleBytes) || sampleBytes <= 0
+    sampleBytes = 1;
+end
+if ~isfield(trackans, 'SamplePos') || ~isfinite(trackans.SamplePos) || trackans.SamplePos < 0
+    trackans.SamplePos = 0;
+end
+trackans.SamplePos = floor(trackans.SamplePos);
+startBytePos = sampleBytes * trackans.SamplePos;
+if ~isfinite(startBytePos) || startBytePos < 0
+    startBytePos = 0;
+    trackans.SamplePos = 0;
+end
+if fseek(fid, startBytePos, 'bof') ~= 0
+    trackans.SamplePos = 0;
+    if fseek(fid, 0, 'bof') ~= 0
+        disp('Tracking guard: unable to seek to a safe file position, exiting!');
+        return
+    end
+end
 
 %--------------------------------------------------------------------------
 % Get a vector with the C/A code sampled 1x/chip
@@ -69,6 +88,39 @@ carrFreq = trackans.carrFreq;
 remCarrPhase = trackans.remCarrPhase;
 codeFreqStart = codeFreq;
 carrFreqStart = carrFreq;
+
+% Runtime guards: long-window DS5 runs occasionally drive the tracking
+% state into invalid numeric regions, which can cascade into oversized
+% sample reads and native heap failures on Windows MATLAB. Clamp state
+% here before any block-size or buffer allocation is derived from it.
+if ~isfield(settings, 'deepTrackGuardEnable'), settings.deepTrackGuardEnable = 1; end
+if ~isfield(settings, 'deepTrackGuardCodeFreqMinHz'), settings.deepTrackGuardCodeFreqMinHz = 0.90 * settings.codeFreqBasis; end
+if ~isfield(settings, 'deepTrackGuardCodeFreqMaxHz'), settings.deepTrackGuardCodeFreqMaxHz = 1.10 * settings.codeFreqBasis; end
+if ~isfield(settings, 'deepTrackGuardCarrOffsetMaxHz'), settings.deepTrackGuardCarrOffsetMaxHz = 20000.0; end
+if ~isfield(settings, 'deepTrackGuardMinBlockSize'), settings.deepTrackGuardMinBlockSize = 1; end
+if ~isfield(settings, 'deepTrackGuardMaxBlockSize'), settings.deepTrackGuardMaxBlockSize = max(1, round(2.5 * settings.samplingFreq / 1000)); end
+if settings.deepTrackGuardEnable
+    if ~isfinite(codeFreq) || codeFreq <= 0
+        codeFreq = settings.codeFreqBasis;
+    end
+    codeFreq = min(max(codeFreq, settings.deepTrackGuardCodeFreqMinHz), settings.deepTrackGuardCodeFreqMaxHz);
+    if ~isfinite(remCodePhase)
+        remCodePhase = 0;
+    end
+    remCodePhase = mod(remCodePhase, settings.codeLength);
+    if ~isfinite(carrFreq)
+        carrFreq = settings.IF;
+    end
+    carrOffsetHz = carrFreq - settings.IF;
+    carrOffsetHz = min(max(carrOffsetHz, -settings.deepTrackGuardCarrOffsetMaxHz), settings.deepTrackGuardCarrOffsetMaxHz);
+    carrFreq = settings.IF + carrOffsetHz;
+    if ~isfinite(remCarrPhase)
+        remCarrPhase = 0;
+    end
+    remCarrPhase = rem(remCarrPhase, 2*pi);
+    codeFreqStart = codeFreq;
+    carrFreqStart = carrFreq;
+end
 
 % code tracking loop parameters
 oldCodeNco   = trackans.codeNco;
@@ -166,8 +218,51 @@ end
 
 %% 寮?濮嬭窡韪?
 % Find the size of a "block" or code period in whole samples
-codePhaseStep = codeFreq / settings.samplingFreq;            
+codePhaseStep = codeFreq / settings.samplingFreq;
+if ~isfinite(codePhaseStep) || codePhaseStep <= 0
+    codePhaseStep = settings.codeFreqBasis / settings.samplingFreq;
+    codeFreq = settings.codeFreqBasis;
+    codeFreqStart = codeFreq;
+end
 blksize = ceil((settings.codeLength - remCodePhase) / codePhaseStep);
+if settings.deepTrackGuardEnable
+    blksize = min(max(blksize, settings.deepTrackGuardMinBlockSize), settings.deepTrackGuardMaxBlockSize);
+end
+safeSamplePos = trackans.SamplePos;
+if settings.deepTrackGuardEnable
+    savedBytePos = ftell(fid);
+    if ~isfinite(savedBytePos) || savedBytePos < 0
+        savedBytePos = 0;
+    end
+    if fseek(fid, 0, 'eof') == 0
+        deepTrackFileBytes = ftell(fid);
+    else
+        deepTrackFileBytes = nan;
+    end
+    if fseek(fid, savedBytePos, 'bof') ~= 0
+        fseek(fid, 0, 'bof');
+    end
+    maxSamplePosAvail = floor(deepTrackFileBytes / sampleBytes);
+    if ~isfinite(maxSamplePosAvail) || maxSamplePosAvail <= 0
+        disp('Tracking guard: invalid tracking file size, exiting!');
+        return
+    end
+    maxStartSamplePos = max(0, maxSamplePosAvail - blksize);
+    safeSamplePos = min(max(0, floor(trackans.SamplePos)), maxStartSamplePos);
+    remainingSamples = maxSamplePosAvail - safeSamplePos;
+    if remainingSamples < settings.deepTrackGuardMinBlockSize
+        disp('Tracking guard: insufficient samples remain for tracking block, exiting!');
+        return
+    end
+    if remainingSamples < blksize
+        blksize = max(settings.deepTrackGuardMinBlockSize, floor(remainingSamples));
+    end
+    trackans.SamplePos = safeSamplePos;
+    if fseek(fid, sampleBytes * safeSamplePos, 'bof') ~= 0
+        disp('Tracking guard: unable to apply safe tracking seek, exiting!');
+        return
+    end
+end
 
 trackans.recvTime = trackans.recvTime + blksize / settings.samplingFreq; % [s]
 
@@ -554,8 +649,12 @@ if shadowReacqEnable && deepModeState >= 1
         cmdHz = (1 - shadowWeight) * baseCmdHz + shadowWeight * shadowCmdHz;
     end
 else
-    cmdHz = baseCmdHz;
+cmdHz = baseCmdHz;
     shadowCmdHz = cmdHz;
+end
+if settings.deepTrackGuardEnable
+    cmdHz = min(max(cmdHz, -settings.deepTrackGuardCarrOffsetMaxHz), settings.deepTrackGuardCarrOffsetMaxHz);
+    shadowCmdHz = min(max(shadowCmdHz, -settings.deepTrackGuardCarrOffsetMaxHz), settings.deepTrackGuardCarrOffsetMaxHz);
 end
 carrFreq = settings.IF + cmdHz;
 
@@ -628,9 +727,17 @@ end
 
 % Modify code freq based on NCO command
 codeFreq = settings.codeFreqBasis - codeNco + (carrFreq - settings.IF) / 1540;   %% PLL Aided DLL correct answer!
+if settings.deepTrackGuardEnable
+    codeFreq = min(max(codeFreq, settings.deepTrackGuardCodeFreqMinHz), settings.deepTrackGuardCodeFreqMaxHz);
+end
 trackans.codeFreq = codeFreq;
 
-trackans.SamplePos = ftell(fid) / settings.dataFormat / settings.fileType;
+currBytePos = ftell(fid);
+if isfinite(currBytePos) && currBytePos >= 0
+    trackans.SamplePos = currBytePos / sampleBytes;
+else
+    trackans.SamplePos = safeSamplePos + blksize;
+end
 
 trackans.codeError          = codeError;
 trackans.codeNco            = codeNco;

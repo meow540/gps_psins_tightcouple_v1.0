@@ -618,6 +618,7 @@ if ~isfield(settings, 'deepShadowDs5FastRefObsTrackBypass'), settings.deepShadow
 if ~isfield(settings, 'deepShadowDs5RefObsTrackRawStrideEpochs'), settings.deepShadowDs5RefObsTrackRawStrideEpochs = 1; end
 if ~isfield(settings, 'deepShadowDs5RefObsTrackRawBurstMs'), settings.deepShadowDs5RefObsTrackRawBurstMs = inf; end
 if ~isfield(settings, 'deepShadowDs5RefObsTrackRawWarmupEpochs'), settings.deepShadowDs5RefObsTrackRawWarmupEpochs = 0; end
+if ~isfield(settings, 'deepShadowDs5RefObsTrackSnapshotAcceptEnable'), settings.deepShadowDs5RefObsTrackSnapshotAcceptEnable = 0; end
 if ~isfield(settings, 'deepShadowDs5RefObsTrackingCodeMedMaxChips'), settings.deepShadowDs5RefObsTrackingCodeMedMaxChips = 0.75; end
 if ~isfield(settings, 'deepShadowDs5RefObsTrackingCodeP95MaxChips'), settings.deepShadowDs5RefObsTrackingCodeP95MaxChips = 1.60; end
 if ~isfield(settings, 'deepShadowDs5RefObsTrackingFreqP95MaxHz'), settings.deepShadowDs5RefObsTrackingFreqP95MaxHz = 350.0; end
@@ -656,6 +657,7 @@ if ~isfield(settings, 'deepShadowDs5FinalContinuityGateEnable'), settings.deepSh
 if ~isfield(settings, 'deepShadowDs5FinalContinuityMaxPredDiffM'), settings.deepShadowDs5FinalContinuityMaxPredDiffM = 60.0; end
 if ~isfield(settings, 'deepShadowDs5FinalContinuitySlewEnable'), settings.deepShadowDs5FinalContinuitySlewEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5FinalContinuityMaxAgeEpochs'), settings.deepShadowDs5FinalContinuityMaxAgeEpochs = 6; end
+if ~isfield(settings, 'deepShadowDs5FinalContinuityWarmStartEpochs'), settings.deepShadowDs5FinalContinuityWarmStartEpochs = 4; end
 if ~isfield(settings, 'deepShadowDs5FinalHoldBaselineCompeteEnable'), settings.deepShadowDs5FinalHoldBaselineCompeteEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5FinalHoldBaselineMinAgeEpochs'), settings.deepShadowDs5FinalHoldBaselineMinAgeEpochs = 2; end
 if ~isfield(settings, 'deepShadowDs5FinalHoldBaselineProxyMarginM'), settings.deepShadowDs5FinalHoldBaselineProxyMarginM = 20.0; end
@@ -694,6 +696,9 @@ if ~isfield(settings, 'deepShadowDs5RecoveredFilterClockHardGateEnable'), settin
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterClockResetDiffMaxM'), settings.deepShadowDs5RecoveredFilterClockResetDiffMaxM = 1500.0; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterResetOnContractMeas'), settings.deepShadowDs5RecoveredFilterResetOnContractMeas = 1; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterResetMeasPredDiffM'), settings.deepShadowDs5RecoveredFilterResetMeasPredDiffM = 1500.0; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterResetAtRecoveryStart'), settings.deepShadowDs5RecoveredFilterResetAtRecoveryStart = 1; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAuthorityWarmStartEnable'), settings.deepShadowDs5RecoveredFilterAuthorityWarmStartEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAuthorityWarmStartEpochs'), settings.deepShadowDs5RecoveredFilterAuthorityWarmStartEpochs = 2; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorGateRequire'), settings.deepShadowDs5RecoveredFilterAbsAnchorGateRequire = 1; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAuthorityRequireAbsAnchor'), settings.deepShadowDs5RecoveredFilterAuthorityRequireAbsAnchor = 1; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterPropagateWithInsVel'), settings.deepShadowDs5RecoveredFilterPropagateWithInsVel = 1; end
@@ -715,6 +720,13 @@ if ~isfield(settings, 'deepShadowDs5RecoveredFilterAuthorityAbsAnchorMaxM'), set
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorEnable'), settings.deepShadowDs5RecoveredFilterAbsAnchorEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorFreezeSec'), settings.deepShadowDs5RecoveredFilterAbsAnchorFreezeSec = settings.deepShadowDs5RefObsRecoveryStartSec; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorUseInsVel'), settings.deepShadowDs5RecoveredFilterAbsAnchorUseInsVel = 1; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshSameSource'), settings.deepShadowDs5RecoveredFilterAbsAnchorRefreshSameSource = 0; end
+if ~isfield(settings, 'deepShadowDs5AbsAnchorRefreshOnlyS5'), settings.deepShadowDs5AbsAnchorRefreshOnlyS5 = 0; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshOnRefObsAccept'), settings.deepShadowDs5RecoveredFilterAbsAnchorRefreshOnRefObsAccept = 1; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorAllowRefObsFallback'), settings.deepShadowDs5RecoveredFilterAbsAnchorAllowRefObsFallback = 0; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshMaxRefObsDiffM'), settings.deepShadowDs5RecoveredFilterAbsAnchorRefreshMaxRefObsDiffM = 350.0; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshSelfHeldEnable'), settings.deepShadowDs5RecoveredFilterAbsAnchorRefreshSelfHeldEnable = 0; end
+if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshTrustedMaxDiffM'), settings.deepShadowDs5RecoveredFilterAbsAnchorRefreshTrustedMaxDiffM = 350.0; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorSoftMaxDiffM'), settings.deepShadowDs5RecoveredFilterAbsAnchorSoftMaxDiffM = 900.0; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorMaxDiffM'), settings.deepShadowDs5RecoveredFilterAbsAnchorMaxDiffM = 1800.0; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorBlend'), settings.deepShadowDs5RecoveredFilterAbsAnchorBlend = 0.02; end
@@ -722,6 +734,7 @@ if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorBlendHigh'), setting
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorAlphaMinScale'), settings.deepShadowDs5RecoveredFilterAbsAnchorAlphaMinScale = 0.15; end
 if ~isfield(settings, 'deepShadowDs5RecoveredFilterAbsAnchorDopplerVelBlend'), settings.deepShadowDs5RecoveredFilterAbsAnchorDopplerVelBlend = 0.25; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorGateEnable'), settings.deepShadowDs5RefObsPositionAbsAnchorGateEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionPreferAbsAnchor'), settings.deepShadowDs5RefObsPositionPreferAbsAnchor = 0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorSoftMaxDiffM'), settings.deepShadowDs5RefObsPositionAbsAnchorSoftMaxDiffM = settings.deepShadowDs5RecoveredFilterAbsAnchorSoftMaxDiffM; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorMaxDiffM'), settings.deepShadowDs5RefObsPositionAbsAnchorMaxDiffM = settings.deepShadowDs5RecoveredFilterAbsAnchorMaxDiffM; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorUseHardGate'), settings.deepShadowDs5RefObsPositionAbsAnchorUseHardGate = 0; end
@@ -729,11 +742,84 @@ if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorScoreWeightM'), setti
 if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorPriorEnable'), settings.deepShadowDs5RefObsPositionAbsAnchorPriorEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorPriorSigmaM'), settings.deepShadowDs5RefObsPositionAbsAnchorPriorSigmaM = 900.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionAbsAnchorPriorSoftSigmaM'), settings.deepShadowDs5RefObsPositionAbsAnchorPriorSoftSigmaM = 1800.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionBootstrapEpochs'), settings.deepShadowDs5RefObsPositionBootstrapEpochs = 40; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionBootstrapCorrMaxM'), settings.deepShadowDs5RefObsPositionBootstrapCorrMaxM = 700.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionBootstrapAnchorDiffMaxM'), settings.deepShadowDs5RefObsPositionBootstrapAnchorDiffMaxM = 700.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionBootstrapJumpMaxM'), settings.deepShadowDs5RefObsPositionBootstrapJumpMaxM = 900.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionResetHistoryAtRecoveryStart'), settings.deepShadowDs5RefObsPositionResetHistoryAtRecoveryStart = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionUseRecentFilterHold'), settings.deepShadowDs5RefObsPositionUseRecentFilterHold = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionRecentFilterHoldMaxAgeEpochs'), settings.deepShadowDs5RefObsPositionRecentFilterHoldMaxAgeEpochs = 24; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionRecentFilterHoldTrustedMaxDiffM'), settings.deepShadowDs5RefObsPositionRecentFilterHoldTrustedMaxDiffM = 350.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionAcceptedHoldTrustedMaxDiffM'), settings.deepShadowDs5RefObsPositionAcceptedHoldTrustedMaxDiffM = 450.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionHoldPredDiffMaxM'), settings.deepShadowDs5RefObsPositionHoldPredDiffMaxM = 280.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailStartSec'), settings.deepShadowDs5RefObsPositionTailStartSec = 320.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailCorrMaxM'), settings.deepShadowDs5RefObsPositionTailCorrMaxM = 650.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailAnchorDiffMaxM'), settings.deepShadowDs5RefObsPositionTailAnchorDiffMaxM = 650.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailJumpMaxM'), settings.deepShadowDs5RefObsPositionTailJumpMaxM = 800.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailPredVelDiffMaxMps'), settings.deepShadowDs5RefObsPositionTailPredVelDiffMaxMps = 260.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetCorrSoftMaxM'), settings.deepShadowDs5RefObsPositionTailSubsetCorrSoftMaxM = 350.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetCorrHardMaxM'), settings.deepShadowDs5RefObsPositionTailSubsetCorrHardMaxM = 900.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetCorrScoreWeightM'), settings.deepShadowDs5RefObsPositionTailSubsetCorrScoreWeightM = 240.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetRmsGoodMaxM'), settings.deepShadowDs5RefObsPositionTailSubsetRmsGoodMaxM = 5.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetRmsGoodBonusM'), settings.deepShadowDs5RefObsPositionTailSubsetRmsGoodBonusM = 60.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetAbsAnchorSoftMaxM'), settings.deepShadowDs5RefObsPositionTailSubsetAbsAnchorSoftMaxM = 220.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetAbsAnchorHardMaxM'), settings.deepShadowDs5RefObsPositionTailSubsetAbsAnchorHardMaxM = 900.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailSubsetAbsAnchorScoreWeightM'), settings.deepShadowDs5RefObsPositionTailSubsetAbsAnchorScoreWeightM = 260.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustHardDropTailRelaxEnable'), settings.deepShadowDs5RefObsPositionRobustHardDropTailRelaxEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustHardDropTailPenaltyM'), settings.deepShadowDs5RefObsPositionRobustHardDropTailPenaltyM = 120.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalMultiStartEnable'), settings.deepShadowDs5RefObsPositionLocalMultiStartEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalInitBlendFractions'), settings.deepShadowDs5RefObsPositionLocalInitBlendFractions = [0 0.25 0.5 0.75 1.0]; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateCorrWeight'), settings.deepShadowDs5RefObsPositionLocalCandidateCorrWeight = 0.08; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateAbsWeight'), settings.deepShadowDs5RefObsPositionLocalCandidateAbsWeight = 0.12; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateInitBiasWeight'), settings.deepShadowDs5RefObsPositionLocalCandidateInitBiasWeight = 0.02; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateGoodRmsMaxM'), settings.deepShadowDs5RefObsPositionLocalCandidateGoodRmsMaxM = 5.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateRmsTieM'), settings.deepShadowDs5RefObsPositionLocalCandidateRmsTieM = 1.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateCorrTieM'), settings.deepShadowDs5RefObsPositionLocalCandidateCorrTieM = 20.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateAbsTieM'), settings.deepShadowDs5RefObsPositionLocalCandidateAbsTieM = 20.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidateInitTieM'), settings.deepShadowDs5RefObsPositionLocalCandidateInitTieM = 10.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionLocalCandidatePdopTie'), settings.deepShadowDs5RefObsPositionLocalCandidatePdopTie = 0.25; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetGoodRmsMaxM'), settings.deepShadowDs5RefObsPositionSubsetGoodRmsMaxM = 5.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetRmsTieM'), settings.deepShadowDs5RefObsPositionSubsetRmsTieM = 2.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetCorrTieM'), settings.deepShadowDs5RefObsPositionSubsetCorrTieM = 40.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetAbsTieM'), settings.deepShadowDs5RefObsPositionSubsetAbsTieM = 40.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetClockTieM'), settings.deepShadowDs5RefObsPositionSubsetClockTieM = 80.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetPdopSoftMax'), settings.deepShadowDs5RefObsPositionSubsetPdopSoftMax = 8.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetPdopHardMax'), settings.deepShadowDs5RefObsPositionSubsetPdopHardMax = 24.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetPdopScoreWeightM'), settings.deepShadowDs5RefObsPositionSubsetPdopScoreWeightM = 80.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetMinSatPenaltyM'), settings.deepShadowDs5RefObsPositionSubsetMinSatPenaltyM = 40.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionSubsetMinSatHighPdopPenaltyM'), settings.deepShadowDs5RefObsPositionSubsetMinSatHighPdopPenaltyM = 120.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorTailEnable'), settings.deepShadowDs5RefObsPositionPreferTrustedAnchorTailEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorTailMinPriority'), settings.deepShadowDs5RefObsPositionPreferTrustedAnchorTailMinPriority = 40; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorTailMaxDiffM'), settings.deepShadowDs5RefObsPositionPreferTrustedAnchorTailMaxDiffM = 80.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorStartSec'), settings.deepShadowDs5RefObsPositionPreferTrustedAnchorStartSec = settings.deepShadowDs5RefObsPositionTailStartSec; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorMinPriority'), settings.deepShadowDs5RefObsPositionPreferTrustedAnchorMinPriority = settings.deepShadowDs5RefObsPositionPreferTrustedAnchorTailMinPriority; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorMaxDiffM'), settings.deepShadowDs5RefObsPositionPreferTrustedAnchorMaxDiffM = 220.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailMinSatPenaltyM'), settings.deepShadowDs5RefObsPositionTailMinSatPenaltyM = 80.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailMinSatFarAbsPenaltyM'), settings.deepShadowDs5RefObsPositionTailMinSatFarAbsPenaltyM = 420.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionTailMinSatFarCorrPenaltyM'), settings.deepShadowDs5RefObsPositionTailMinSatFarCorrPenaltyM = 260.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapeEnable'), settings.deepShadowDs5RefObsPositionEscapeEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapeStaleAgeEpochs'), settings.deepShadowDs5RefObsPositionEscapeStaleAgeEpochs = 8; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapeMinSat'), settings.deepShadowDs5RefObsPositionEscapeMinSat = 5; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapePostfitMaxM'), settings.deepShadowDs5RefObsPositionEscapePostfitMaxM = 40.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapeDeltaSpreadP95MaxM'), settings.deepShadowDs5RefObsPositionEscapeDeltaSpreadP95MaxM = 250.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapeCorrMaxM'), settings.deepShadowDs5RefObsPositionEscapeCorrMaxM = 900.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapeAnchorDiffMaxM'), settings.deepShadowDs5RefObsPositionEscapeAnchorDiffMaxM = 900.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapeJumpMaxM'), settings.deepShadowDs5RefObsPositionEscapeJumpMaxM = 1200.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionEscapePredVelDiffMaxMps'), settings.deepShadowDs5RefObsPositionEscapePredVelDiffMaxMps = 250.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionClockSoftMaxM'), settings.deepShadowDs5RefObsPositionClockSoftMaxM = 1200.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionClockHardMaxM'), settings.deepShadowDs5RefObsPositionClockHardMaxM = 3500.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionClockScoreWeightM'), settings.deepShadowDs5RefObsPositionClockScoreWeightM = 100.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionClockPriorEnable'), settings.deepShadowDs5RefObsPositionClockPriorEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionClockPriorSigmaM'), settings.deepShadowDs5RefObsPositionClockPriorSigmaM = 1200.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeEnable'), settings.deepShadowDs5RefObsPositionHighPdopEscapeEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeMaxPdop'), settings.deepShadowDs5RefObsPositionHighPdopEscapeMaxPdop = 32.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionHighPdopEscapePostfitMaxM'), settings.deepShadowDs5RefObsPositionHighPdopEscapePostfitMaxM = 0.02; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeCorrMaxM'), settings.deepShadowDs5RefObsPositionHighPdopEscapeCorrMaxM = 220.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeAnchorDiffMaxM'), settings.deepShadowDs5RefObsPositionHighPdopEscapeAnchorDiffMaxM = 220.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeJumpMaxM'), settings.deepShadowDs5RefObsPositionHighPdopEscapeJumpMaxM = 260.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockSubsetSoftMaxM'), settings.deepShadowDs5RefObsPositionCommonClockSubsetSoftMaxM = 1200.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockSubsetHardMaxM'), settings.deepShadowDs5RefObsPositionCommonClockSubsetHardMaxM = 3500.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockSubsetScoreWeightM'), settings.deepShadowDs5RefObsPositionCommonClockSubsetScoreWeightM = 140.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockEnable'), settings.deepShadowDs5RefObsPositionCommonClockEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockMinSat'), settings.deepShadowDs5RefObsPositionCommonClockMinSat = 3; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockGateFloorM'), settings.deepShadowDs5RefObsPositionCommonClockGateFloorM = 250.0; end
@@ -742,7 +828,9 @@ if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockPriorBlend'), setti
 if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockPriorMaxPullM'), settings.deepShadowDs5RefObsPositionCommonClockPriorMaxPullM = 1500.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockBadScoreThresh'), settings.deepShadowDs5RefObsPositionCommonClockBadScoreThresh = 2.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockRebaseEnable'), settings.deepShadowDs5RefObsPositionCommonClockRebaseEnable = 1; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockRebaseEachDelta'), settings.deepShadowDs5RefObsPositionCommonClockRebaseEachDelta = 1; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockRebasePeriodM'), settings.deepShadowDs5RefObsPositionCommonClockRebasePeriodM = settings.c * 1e-3; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionCommonClockHalfPeriodRebaseEnable'), settings.deepShadowDs5RefObsPositionCommonClockHalfPeriodRebaseEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5ObsContractIndependentCodeErrMaxChips'), settings.deepShadowDs5ObsContractIndependentCodeErrMaxChips = settings.deepShadowDs5RefObsTrackingCodeP95MaxChips; end
 if ~isfield(settings, 'deepShadowDs5ObsContractIndependentFreqErrMaxHz'), settings.deepShadowDs5ObsContractIndependentFreqErrMaxHz = settings.deepShadowDs5RefObsTrackingFreqP95MaxHz; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustHardDropPrns'), settings.deepShadowDs5RefObsPositionRobustHardDropPrns = [21 27]; end
@@ -752,6 +840,7 @@ if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustTargetKeepPenaltyM'), se
 if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustSubsetEnable'), settings.deepShadowDs5RefObsPositionRobustSubsetEnable = 1; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustMaxDropSat'), settings.deepShadowDs5RefObsPositionRobustMaxDropSat = 2; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustDropPenaltyM'), settings.deepShadowDs5RefObsPositionRobustDropPenaltyM = 20.0; end
+if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustKeepSatBonusM'), settings.deepShadowDs5RefObsPositionRobustKeepSatBonusM = 18.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustBadPrns'), settings.deepShadowDs5RefObsPositionRobustBadPrns = [27 9]; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustBadKeepPenaltyM'), settings.deepShadowDs5RefObsPositionRobustBadKeepPenaltyM = 80.0; end
 if ~isfield(settings, 'deepShadowDs5RefObsPositionRobustTargetKeepPenaltyM'), settings.deepShadowDs5RefObsPositionRobustTargetKeepPenaltyM = 18.0; end
@@ -824,6 +913,18 @@ if ~isfield(settings, 'deepShadowDs5BranchObsGateMadScale'), settings.deepShadow
 if ~isfield(settings, 'deepShadowDs5BranchObsGateCeilM'), settings.deepShadowDs5BranchObsGateCeilM = 1500.0; end
 if ~isfield(settings, 'deepShadowTrustedAnchorEnable'), settings.deepShadowTrustedAnchorEnable = 0; end
 if ~isfield(settings, 'deepShadowTrustedAnchorUseTruthTrj'), settings.deepShadowTrustedAnchorUseTruthTrj = 0; end
+if ~isfield(settings, 'deepShadowTrustedAnchorPreferTruthTrj'), settings.deepShadowTrustedAnchorPreferTruthTrj = 0; end
+if ~isfield(settings, 'deepShadowTrustedAnchorTruthUseCurrentEpoch'), settings.deepShadowTrustedAnchorTruthUseCurrentEpoch = 0; end
+if ~isfield(settings, 'deepShadowTrustedAnchorUseInsPropagated'), settings.deepShadowTrustedAnchorUseInsPropagated = 0; end
+if ~isfield(settings, 'deepShadowTrustedAnchorInsPropagatedUseCurrent'), settings.deepShadowTrustedAnchorInsPropagatedUseCurrent = 1; end
+if ~isfield(settings, 'deepShadowTrustedAnchorUseBaselineInsAlign'), settings.deepShadowTrustedAnchorUseBaselineInsAlign = 0; end
+if ~isfield(settings, 'deepShadowTrustedAnchorBaselineInsAlignUseBaselineCurrent'), settings.deepShadowTrustedAnchorBaselineInsAlignUseBaselineCurrent = 1; end
+if ~isfield(settings, 'deepShadowTrustedAnchorBaselineInsAlignUseCurrent'), settings.deepShadowTrustedAnchorBaselineInsAlignUseCurrent = 1; end
+if ~isfield(settings, 'deepShadowTrustedAnchorBaselineInsAlignRefreshAfterStart'), settings.deepShadowTrustedAnchorBaselineInsAlignRefreshAfterStart = 0; end
+if ~isfield(settings, 'deepShadowTrustedAnchorAllowBaselineFedAnchor'), settings.deepShadowTrustedAnchorAllowBaselineFedAnchor = 1; end
+if ~isfield(settings, 'deepShadowTrustedAnchorAllowHigherPriorityReplace'), settings.deepShadowTrustedAnchorAllowHigherPriorityReplace = 1; end
+if ~isfield(settings, 'deepShadowTrustedAnchorRefreshSameSource'), settings.deepShadowTrustedAnchorRefreshSameSource = 1; end
+if ~isfield(settings, 'deepShadowTrustedAnchorRefreshOnlyS5'), settings.deepShadowTrustedAnchorRefreshOnlyS5 = 0; end
 if ~isfield(settings, 'deepShadowTrustedAnchorTimeSec'), settings.deepShadowTrustedAnchorTimeSec = 90.0; end
 if ~isfield(settings, 'deepShadowTrustedAnchorUseVelocity'), settings.deepShadowTrustedAnchorUseVelocity = 1; end
 if ~isfield(settings, 'deepShadowTrustedAnchorAllowCurrentFallback'), settings.deepShadowTrustedAnchorAllowCurrentFallback = 1; end
@@ -966,7 +1067,14 @@ trustedAnchorValid = false;
 trustedAnchorPos = nan(3,1);
 trustedAnchorVel = nan(3,1);
 trustedAnchorTimeSec = nan;
-trustedAnchorSource = 0;  % 0 none, 1 online pre-spoof main-nav, 2 simulation truth/trj, 3 baseline-fed
+trustedAnchorSource = 0;  % 0 none, 1 online pre-spoof main-nav, 2 simulation truth/trj, 3 baseline-fed, 4 INS propagated, 5 baseline aligned to INS
+trustedAnchorInsBasePos = nan(3,1);
+trustedAnchorInsBaseVel = nan(3,1);
+trustedAnchorInsBaseTimeSec = nan;
+trustedAnchorBaselineAlignOffset = nan(3,1);
+trustedAnchorBaselineAlignPos = nan(3,1);
+trustedAnchorBaselineAlignVel = nan(3,1);
+trustedAnchorBaselineAlignTimeSec = nan;
 branchTakeoverCnt = 0;
 shadowBranchAmbigHoldChips = nan(numActChnList, 1);
 shadowBranchAmbigHoldAge = inf(numActChnList, 1);
@@ -1011,6 +1119,7 @@ shadowRecoveredFilterBadCount = 0;
 shadowRecoveredFilterAuthority = false;
 shadowRecoveredFilterLastUpdatePos = nan(3,1);
 shadowRecoveredFilterLastUpdateEpoch = nan;
+ds5RecoveryEntryResetDone = false;
 ds5RecoveredAbsAnchorPos = nan(3,1);
 ds5RecoveredAbsAnchorVel = nan(3,1);
 ds5RecoveredAbsAnchorEpoch = nan;
@@ -1971,7 +2080,9 @@ for currMeasNr = 1 : roundTime
                     if ds5RefObsRawLimitedNow && trackShadowLocal.recvTime < positioningTime
                         trackShadowLocal = localApplyFastDs5RefObsShadowState( ...
                             trackShadowLocal, trackDeepIn(ii), ds5TrueRefHzState(ii), ds5TrueRefCodeState(ii), settings);
-                        navResults.shadowDs5RefObsTrackCoasted(ii, currMeasNr) = true;
+                        snapshotAcceptNow = rawStepsThisEpoch > 0 && ...
+                            localGetSettingValue(settings, 'deepShadowDs5RefObsTrackSnapshotAcceptEnable', 0) ~= 0;
+                        navResults.shadowDs5RefObsTrackCoasted(ii, currMeasNr) = ~snapshotAcceptNow;
                     end
                     trackShadow(ii) = trackShadowLocal;
                 else
@@ -2659,37 +2770,194 @@ for currMeasNr = 1 : roundTime
     
     [posxyz, ~] = blh2xyz(ins.pos);
     epochElapsedSec = (currMeasNr - 1) * settings.navSolPeriod / 1000;
+    if localIsDs5Scenario(settings) && ~ds5RecoveryEntryResetDone
+        navSolPeriodSecLocal = localGetSettingValue(settings, 'navSolPeriod', 500.0) / 1000.0;
+        recoveryStartSecLocal = localGetSettingValue(settings, 'deepShadowDs5RefObsRecoveryStartSec', 92.0);
+        recoveryStartEpochLocal = max(1, ceil(max(0, recoveryStartSecLocal - 1e-9) / max(navSolPeriodSecLocal, eps)) + 1);
+        if currMeasNr >= recoveryStartEpochLocal
+            if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionResetHistoryAtRecoveryStart', 1) ~= 0
+                ds5RefObsPosLastAccepted = nan(3,1);
+                ds5RefObsPosPrevAccepted = nan(3,1);
+                ds5RefObsPosLastAcceptedEpoch = nan;
+                ds5RefObsPosPrevAcceptedEpoch = nan;
+            end
+            if localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterResetAtRecoveryStart', 1) ~= 0
+                shadowRecoveredFilterPos = nan(3,1);
+                shadowRecoveredFilterVel = nan(3,1);
+                shadowRecoveredFilterClockM = nan;
+                shadowRecoveredFilterClockRateMps = nan;
+                shadowRecoveredFilterEpoch = nan;
+                shadowRecoveredFilterCoastAge = inf;
+                shadowRecoveredFilterGoodCount = 0;
+                shadowRecoveredFilterBadCount = 0;
+                shadowRecoveredFilterAuthority = false;
+                shadowRecoveredFilterLastUpdatePos = nan(3,1);
+                shadowRecoveredFilterLastUpdateEpoch = nan;
+            end
+            ds5RecoveryEntryResetDone = true;
+        end
+    end
     [baselineOutputPos, baselineOutputVel, baselineOutputValid, baselineOutputLastPos, baselineOutputLastVel, baselineOutputLastEpoch, baselineOutputHoldAgeNow] = ...
         localGetBaselineOutput(navSolutions, currMeasNr, baselineOutputLastPos, baselineOutputLastVel, baselineOutputLastEpoch, settings);
     if settings.deepShadowTrustedAnchorEnable
         baselineTrustedRefNow = localUseDs5BaselineTrustedRef(settings, currMeasNr) && baselineOutputValid && all(isfinite(baselineOutputPos));
-        if baselineTrustedRefNow
+        insVelNow = localNedVelToEcef(ins.pos, ins.vn);
+        if deepModeState < 2 && epochElapsedSec <= settings.deepShadowTrustedAnchorTimeSec && all(isfinite(posxyz))
+            trustedAnchorInsBasePos = posxyz(:);
+            trustedAnchorInsBaseVel = insVelNow(:);
+            trustedAnchorInsBaseTimeSec = epochElapsedSec;
+            if baselineTrustedRefNow && localGetSettingValue(settings, 'deepShadowTrustedAnchorUseBaselineInsAlign', 0) ~= 0
+                trustedAnchorBaselineAlignOffset = baselineOutputPos(:) - posxyz(:);
+                trustedAnchorBaselineAlignPos = baselineOutputPos(:);
+                if all(isfinite(baselineOutputVel))
+                    trustedAnchorBaselineAlignVel = baselineOutputVel(:);
+                else
+                    trustedAnchorBaselineAlignVel = insVelNow(:);
+                end
+                trustedAnchorBaselineAlignTimeSec = epochElapsedSec;
+            end
+        end
+        useAnchorVelNow = localGetSettingValue(settings, 'deepShadowTrustedAnchorUseVelocity', 1) ~= 0;
+        if settings.deepShadowTrustedAnchorUseTruthTrj && epochElapsedSec >= settings.deepShadowTrustedAnchorTimeSec
+            truthAnchorTimeSec = settings.deepShadowTrustedAnchorTimeSec;
+            if localGetSettingValue(settings, 'deepShadowTrustedAnchorTruthUseCurrentEpoch', 0) ~= 0
+                truthAnchorTimeSec = epochElapsedSec;
+            end
+            [taPos, taVel, taOk] = localTrustedAnchorFromTrj(trj, t0_imu + truthAnchorTimeSec);
+            if taOk && localShouldReplaceDs5TrustedAnchor(trustedAnchorValid, trustedAnchorSource, 2, settings)
+                trustedAnchorValid = true;
+                trustedAnchorPos = taPos(:);
+                if useAnchorVelNow
+                    trustedAnchorVel = taVel(:);
+                else
+                    trustedAnchorVel = nan(3,1);
+                end
+                trustedAnchorTimeSec = truthAnchorTimeSec;
+                trustedAnchorSource = 2;
+            end
+        end
+        if localGetSettingValue(settings, 'deepShadowTrustedAnchorUseBaselineInsAlign', 0) ~= 0 && ...
+                epochElapsedSec >= settings.deepShadowTrustedAnchorTimeSec && ...
+                all(isfinite(trustedAnchorBaselineAlignPos)) && ...
+                localShouldReplaceDs5TrustedAnchor(trustedAnchorValid, trustedAnchorSource, 5, settings)
+            trustedAnchorAlignPos = nan(3,1);
+            trustedAnchorAlignVelNow = nan(3,1);
+            trustedAnchorAlignBaselineCurrentPos = nan(3,1);
+            baselineAlignUseCurrent = localGetSettingValue(settings, 'deepShadowTrustedAnchorBaselineInsAlignUseCurrent', 1) ~= 0;
+            baselineAlignUseBaselineCurrent = localGetSettingValue(settings, 'deepShadowTrustedAnchorBaselineInsAlignUseBaselineCurrent', 1) ~= 0;
+            baselineAlignRefreshAfterStart = localGetSettingValue(settings, 'deepShadowTrustedAnchorBaselineInsAlignRefreshAfterStart', 0) ~= 0;
+            if baselineAlignRefreshAfterStart && baselineTrustedRefNow && all(isfinite(posxyz)) && all(isfinite(baselineOutputPos))
+                trustedAnchorBaselineAlignOffset = baselineOutputPos(:) - posxyz(:);
+                trustedAnchorBaselineAlignPos = baselineOutputPos(:);
+                trustedAnchorBaselineAlignTimeSec = epochElapsedSec;
+                if all(isfinite(baselineOutputVel))
+                    trustedAnchorBaselineAlignVel = baselineOutputVel(:);
+                elseif all(isfinite(insVelNow))
+                    trustedAnchorBaselineAlignVel = insVelNow(:);
+                end
+            end
+            if all(isfinite(trustedAnchorInsBasePos)) && isfinite(trustedAnchorInsBaseTimeSec) && ...
+                    all(isfinite(trustedAnchorBaselineAlignOffset))
+                if all(isfinite(trustedAnchorInsBaseVel))
+                    trustedAnchorAlignPos = trustedAnchorInsBasePos(:) + ...
+                        (epochElapsedSec - trustedAnchorInsBaseTimeSec) * trustedAnchorInsBaseVel(:) + ...
+                        trustedAnchorBaselineAlignOffset(:);
+                    trustedAnchorAlignVelNow = trustedAnchorInsBaseVel(:);
+                else
+                        trustedAnchorAlignPos = trustedAnchorInsBasePos(:) + trustedAnchorBaselineAlignOffset(:);
+                end
+            end
+            if baselineAlignUseBaselineCurrent && baselineOutputValid && all(isfinite(baselineOutputPos))
+                trustedAnchorAlignBaselineCurrentPos = baselineOutputPos(:);
+                if all(isfinite(baselineOutputVel))
+                    trustedAnchorAlignVelNow = baselineOutputVel(:);
+                elseif all(isfinite(insVelNow))
+                    trustedAnchorAlignVelNow = insVelNow(:);
+                end
+            elseif baselineAlignUseCurrent && all(isfinite(posxyz)) && all(isfinite(trustedAnchorBaselineAlignOffset))
+                trustedAnchorAlignPos = posxyz(:) + trustedAnchorBaselineAlignOffset(:);
+                if all(isfinite(insVelNow))
+                    trustedAnchorAlignVelNow = insVelNow(:);
+                elseif all(isfinite(trustedAnchorBaselineAlignVel))
+                    trustedAnchorAlignVelNow = trustedAnchorBaselineAlignVel(:);
+                end
+            elseif ~all(isfinite(trustedAnchorAlignPos)) && all(isfinite(trustedAnchorBaselineAlignPos))
+                trustedAnchorAlignPos = trustedAnchorBaselineAlignPos(:);
+                if all(isfinite(trustedAnchorBaselineAlignVel)) && isfinite(trustedAnchorBaselineAlignTimeSec)
+                    trustedAnchorAlignDt = epochElapsedSec - trustedAnchorBaselineAlignTimeSec;
+                    trustedAnchorAlignPos = trustedAnchorAlignPos + trustedAnchorAlignDt * trustedAnchorBaselineAlignVel(:);
+                    trustedAnchorAlignVelNow = trustedAnchorBaselineAlignVel(:);
+                end
+            end
+            if all(isfinite(trustedAnchorAlignBaselineCurrentPos))
+                trustedAnchorAlignPos = trustedAnchorAlignBaselineCurrentPos(:);
+            end
+            if ~all(isfinite(trustedAnchorAlignPos))
+                trustedAnchorAlignPos = nan(3,1);
+            end
+            if ~all(isfinite(trustedAnchorAlignVelNow))
+                trustedAnchorAlignVelNow = nan(3,1);
+            end
+            if ~all(isfinite(trustedAnchorAlignPos))
+                % Source=5 must stay in the INS-aligned baseline frame, not direct baseline output.
+            else
+                trustedAnchorValid = true;
+                trustedAnchorPos = trustedAnchorAlignPos(:);
+                if useAnchorVelNow && all(isfinite(trustedAnchorAlignVelNow))
+                    trustedAnchorVel = trustedAnchorAlignVelNow(:);
+                else
+                    trustedAnchorVel = nan(3,1);
+                end
+                trustedAnchorTimeSec = epochElapsedSec;
+                trustedAnchorSource = 5;
+            end
+        end
+        if localGetSettingValue(settings, 'deepShadowTrustedAnchorUseInsPropagated', 0) ~= 0 && ...
+                epochElapsedSec >= settings.deepShadowTrustedAnchorTimeSec && ...
+                all(isfinite(trustedAnchorInsBasePos)) && isfinite(trustedAnchorInsBaseTimeSec) && ...
+                localShouldReplaceDs5TrustedAnchor(trustedAnchorValid, trustedAnchorSource, 4, settings)
+            if localGetSettingValue(settings, 'deepShadowTrustedAnchorInsPropagatedUseCurrent', 1) ~= 0 && all(isfinite(posxyz))
+                insPropPos = posxyz(:);
+            elseif all(isfinite(trustedAnchorInsBaseVel))
+                insPropPos = trustedAnchorInsBasePos(:) + (epochElapsedSec - trustedAnchorInsBaseTimeSec) * trustedAnchorInsBaseVel(:);
+            else
+                insPropPos = nan(3,1);
+            end
+            if all(isfinite(insPropPos))
+                trustedAnchorValid = true;
+                trustedAnchorPos = insPropPos(:);
+                if useAnchorVelNow && all(isfinite(insVelNow))
+                    trustedAnchorVel = insVelNow(:);
+                else
+                    trustedAnchorVel = nan(3,1);
+                end
+                trustedAnchorTimeSec = epochElapsedSec;
+                trustedAnchorSource = 4;
+            end
+        end
+        if deepModeState < 2 && epochElapsedSec <= settings.deepShadowTrustedAnchorTimeSec && all(isfinite(posxyz)) && ...
+                localShouldReplaceDs5TrustedAnchor(trustedAnchorValid, trustedAnchorSource, 1, settings)
+            trustedAnchorValid = true;
+            trustedAnchorPos = posxyz(:);
+            if useAnchorVelNow && all(isfinite(insVelNow))
+                trustedAnchorVel = insVelNow(:);
+            else
+                trustedAnchorVel = nan(3,1);
+            end
+            trustedAnchorTimeSec = epochElapsedSec;
+            trustedAnchorSource = 1;
+        end
+        if localGetSettingValue(settings, 'deepShadowTrustedAnchorAllowBaselineFedAnchor', 1) ~= 0 && ...
+                baselineTrustedRefNow && localShouldReplaceDs5TrustedAnchor(trustedAnchorValid, trustedAnchorSource, 3, settings)
             trustedAnchorValid = true;
             trustedAnchorPos = baselineOutputPos(:);
-            if localGetSettingValue(settings, 'deepShadowDs5BaselineTrustedRefUseVelocity', 1) ~= 0 && all(isfinite(baselineOutputVel))
+            if useAnchorVelNow && localGetSettingValue(settings, 'deepShadowDs5BaselineTrustedRefUseVelocity', 1) ~= 0 && all(isfinite(baselineOutputVel))
                 trustedAnchorVel = baselineOutputVel(:);
             else
                 trustedAnchorVel = nan(3,1);
             end
             trustedAnchorTimeSec = epochElapsedSec;
             trustedAnchorSource = 3;
-        elseif settings.deepShadowTrustedAnchorUseTruthTrj
-            if ~trustedAnchorValid && epochElapsedSec >= settings.deepShadowTrustedAnchorTimeSec
-                [taPos, taVel, taOk] = localTrustedAnchorFromTrj(trj, t0_imu + settings.deepShadowTrustedAnchorTimeSec);
-                if taOk
-                    trustedAnchorValid = true;
-                    trustedAnchorPos = taPos(:);
-                    trustedAnchorVel = taVel(:);
-                    trustedAnchorTimeSec = settings.deepShadowTrustedAnchorTimeSec;
-                    trustedAnchorSource = 2;
-                end
-            end
-        elseif deepModeState < 2 && epochElapsedSec <= settings.deepShadowTrustedAnchorTimeSec
-            trustedAnchorValid = true;
-            trustedAnchorPos = posxyz(:);
-            trustedAnchorVel = localNedVelToEcef(ins.pos, ins.vn);
-            trustedAnchorTimeSec = epochElapsedSec;
-            trustedAnchorSource = 1;
         end
         navResults.shadowTrustedAnchorValid(1, currMeasNr) = trustedAnchorValid;
         navResults.shadowTrustedAnchorSource(1, currMeasNr) = trustedAnchorSource;
@@ -2726,14 +2994,26 @@ for currMeasNr = 1 : roundTime
             absAnchorCandSource = 20;
         end
         absAnchorFreezeSec = localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAbsAnchorFreezeSec', settings.deepShadowDs5RefObsRecoveryStartSec);
-        if (~ds5RecoveredAbsAnchorValid || deepModeState < 2 || epochElapsedSec <= absAnchorFreezeSec) && all(isfinite(absAnchorCandPos))
+        absAnchorFrozenNow = ds5RecoveredAbsAnchorValid && deepModeState == 2 && epochElapsedSec > absAnchorFreezeSec;
+        absAnchorCanReplaceFrozen = absAnchorFrozenNow && localDs5AnchorSourcePriority(absAnchorCandSource) > localDs5AnchorSourcePriority(ds5RecoveredAbsAnchorSource);
+        absAnchorCanRefreshFrozen = absAnchorFrozenNow && ...
+            localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshSameSource', 0) ~= 0 && ...
+            absAnchorCandSource == ds5RecoveredAbsAnchorSource && localDs5AnchorSourcePriority(absAnchorCandSource) > 0;
+        if absAnchorCanRefreshFrozen && ...
+                localGetSettingValue(settings, 'deepShadowDs5AbsAnchorRefreshOnlyS5', 0) ~= 0
+            absAnchorCanRefreshFrozen = (absAnchorCandSource == 5);
+        end
+        absAnchorCanUpdate = (~ds5RecoveredAbsAnchorValid || deepModeState < 2 || epochElapsedSec <= absAnchorFreezeSec || ...
+            absAnchorCanReplaceFrozen || absAnchorCanRefreshFrozen) && ...
+            all(isfinite(absAnchorCandPos));
+        if absAnchorCanUpdate
             ds5RecoveredAbsAnchorPos = absAnchorCandPos(:);
             ds5RecoveredAbsAnchorVel = absAnchorCandVel(:);
             ds5RecoveredAbsAnchorEpoch = currMeasNr;
             ds5RecoveredAbsAnchorTimeSec = epochElapsedSec;
             ds5RecoveredAbsAnchorValid = true;
-            ds5RecoveredAbsAnchorFrozen = false;
             ds5RecoveredAbsAnchorSource = absAnchorCandSource;
+            ds5RecoveredAbsAnchorFrozen = deepModeState == 2 && epochElapsedSec > absAnchorFreezeSec;
         elseif ds5RecoveredAbsAnchorValid && deepModeState == 2 && epochElapsedSec > absAnchorFreezeSec
             ds5RecoveredAbsAnchorFrozen = true;
         end
@@ -4116,28 +4396,142 @@ for currMeasNr = 1 : roundTime
             refObsHoldPos = nan(3,1);
             refObsHoldVel = nan(3,1);
             refObsAnchorSource = 0;
-            if shadowRecoveredFilterAuthority && all(isfinite(shadowRecoveredFilterPos))
-                refObsHoldPos = shadowRecoveredFilterPos(:);
-                refObsAnchorSource = 4;
+            trustedAnchorHoldPos = nan(3,1);
+            if trustedAnchorValid && all(isfinite(trustedAnchorPos))
+                trustedAnchorHoldPos = trustedAnchorPos(:);
+                if all(isfinite(trustedAnchorVel)) && isfinite(trustedAnchorTimeSec)
+                    trustedDt = epochElapsedSec - trustedAnchorTimeSec;
+                    if isfinite(trustedDt) && trustedDt >= 0
+                        trustedAnchorHoldPos = trustedAnchorPos(:) + trustedDt * trustedAnchorVel(:);
+                    end
+                end
+            end
+            recentFilterHoldOk = all(isfinite(shadowRecoveredFilterPos)) && isfinite(shadowRecoveredFilterEpoch);
+            recentFilterHoldPos = nan(3,1);
+            recentFilterHoldVel = nan(3,1);
+            if recentFilterHoldOk
+                maxRecentFilterAge = max(0, round(localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRecentFilterHoldMaxAgeEpochs', 24)));
+                if isfinite(maxRecentFilterAge) && maxRecentFilterAge > 0
+                    recentFilterHoldOk = (currMeasNr - shadowRecoveredFilterEpoch) <= maxRecentFilterAge;
+                end
+                if ~shadowRecoveredFilterAuthority && localGetSettingValue(settings, 'deepShadowDs5RefObsPositionUseRecentFilterHold', 1) == 0
+                    recentFilterHoldOk = false;
+                end
+                recentFilterHoldPos = shadowRecoveredFilterPos(:);
                 if all(isfinite(shadowRecoveredFilterVel))
-                    refObsHoldVel = shadowRecoveredFilterVel(:);
+                    recentFilterHoldVel = shadowRecoveredFilterVel(:);
                     if isfinite(shadowRecoveredFilterEpoch)
                         filtDt = (currMeasNr - shadowRecoveredFilterEpoch) * settings.navSolPeriod / 1000;
                         if isfinite(filtDt) && filtDt > 0
-                            refObsHoldPos = refObsHoldPos + filtDt * refObsHoldVel(:);
+                            recentFilterHoldPos = recentFilterHoldPos + filtDt * recentFilterHoldVel(:);
                         end
                     end
                 end
-            elseif all(isfinite(ds5RefObsPosLastAccepted)) && isfinite(ds5RefObsPosLastAcceptedEpoch) && ...
-                    (currMeasNr - ds5RefObsPosLastAcceptedEpoch) <= localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterMaxCoastEpochs', 80)
-                refObsHoldPos = ds5RefObsPosLastAccepted(:);
-                refObsAnchorSource = 5;
+                if all(isfinite(trustedAnchorHoldPos))
+                    recentHoldTrustedMaxDiffM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRecentFilterHoldTrustedMaxDiffM', 350.0);
+                    recentHoldTrustedDiffM = norm(recentFilterHoldPos(:) - trustedAnchorHoldPos(:));
+                    if isfinite(recentHoldTrustedMaxDiffM) && recentHoldTrustedMaxDiffM > 0 && ...
+                            isfinite(recentHoldTrustedDiffM) && recentHoldTrustedDiffM > recentHoldTrustedMaxDiffM
+                        recentFilterHoldOk = false;
+                    end
+                end
+                if recentFilterHoldOk && all(isfinite(ds5RefObsPosLastAccepted)) && isfinite(ds5RefObsPosLastAcceptedEpoch)
+                    recentPredPos = ds5RefObsPosLastAccepted(:);
+                    recentPredDt = (currMeasNr - ds5RefObsPosLastAcceptedEpoch) * settings.navSolPeriod / 1000;
+                    if all(isfinite(shadowClosedLoopLastVel)) && isfinite(recentPredDt) && recentPredDt > 0
+                        recentPredPos = recentPredPos + recentPredDt * shadowClosedLoopLastVel(:);
+                    end
+                    holdPredDiffMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHoldPredDiffMaxM', 280.0);
+                    recentHoldPredDiffM = norm(recentFilterHoldPos(:) - recentPredPos(:));
+                    if isfinite(holdPredDiffMaxM) && holdPredDiffMaxM > 0 && ...
+                            isfinite(recentHoldPredDiffM) && recentHoldPredDiffM > holdPredDiffMaxM
+                        recentFilterHoldOk = false;
+                    end
+                end
+                if recentFilterHoldOk && trustedAnchorValid && all(isfinite(trustedAnchorHoldPos)) && ...
+                        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorTailEnable', 1) ~= 0
+                    preferTrustedStartSec = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorStartSec', ...
+                        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailStartSec', 320.0));
+                    preferTailNow = isfinite(preferTrustedStartSec) && epochElapsedSec >= preferTrustedStartSec;
+                    trustedPriorityMin = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorMinPriority', 40);
+                    trustedTailMaxDiffM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorMaxDiffM', 220.0);
+                    trustedPriorityNow = localDs5AnchorSourcePriority(trustedAnchorSource);
+                    recentTrustedDiffM = norm(recentFilterHoldPos(:) - trustedAnchorHoldPos(:));
+                    if preferTailNow && trustedPriorityNow >= trustedPriorityMin && ...
+                            isfinite(recentTrustedDiffM) && recentTrustedDiffM > trustedTailMaxDiffM
+                        recentFilterHoldOk = false;
+                    end
+                end
+            end
+            acceptedRefHoldOk = all(isfinite(ds5RefObsPosLastAccepted)) && isfinite(ds5RefObsPosLastAcceptedEpoch) && ...
+                (currMeasNr - ds5RefObsPosLastAcceptedEpoch) <= localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterMaxCoastEpochs', 80);
+            acceptedRefHoldPos = nan(3,1);
+            acceptedRefHoldVel = nan(3,1);
+            if acceptedRefHoldOk
+                acceptedRefHoldPos = ds5RefObsPosLastAccepted(:);
                 if all(isfinite(shadowClosedLoopLastVel))
-                    refObsHoldVel = shadowClosedLoopLastVel(:);
+                    acceptedRefHoldVel = shadowClosedLoopLastVel(:);
                     accDt = (currMeasNr - ds5RefObsPosLastAcceptedEpoch) * settings.navSolPeriod / 1000;
                     if isfinite(accDt) && accDt > 0
-                        refObsHoldPos = refObsHoldPos + accDt * refObsHoldVel(:);
+                        acceptedRefHoldPos = acceptedRefHoldPos + accDt * acceptedRefHoldVel(:);
                     end
+                end
+                if all(isfinite(trustedAnchorHoldPos))
+                    acceptedHoldTrustedMaxDiffM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionAcceptedHoldTrustedMaxDiffM', 450.0);
+                    acceptedHoldTrustedDiffM = norm(acceptedRefHoldPos(:) - trustedAnchorHoldPos(:));
+                    if isfinite(acceptedHoldTrustedMaxDiffM) && acceptedHoldTrustedMaxDiffM > 0 && ...
+                            isfinite(acceptedHoldTrustedDiffM) && acceptedHoldTrustedDiffM > acceptedHoldTrustedMaxDiffM
+                        acceptedRefHoldOk = false;
+                    end
+                end
+                if acceptedRefHoldOk && all(isfinite(ds5RefObsPosPrevAccepted)) && isfinite(ds5RefObsPosPrevAcceptedEpoch)
+                    acceptedPredPos = ds5RefObsPosPrevAccepted(:);
+                    acceptedPredDt = (currMeasNr - ds5RefObsPosPrevAcceptedEpoch) * settings.navSolPeriod / 1000;
+                    if all(isfinite(shadowClosedLoopLastVel)) && isfinite(acceptedPredDt) && acceptedPredDt > 0
+                        acceptedPredPos = acceptedPredPos + acceptedPredDt * shadowClosedLoopLastVel(:);
+                    end
+                    holdPredDiffMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHoldPredDiffMaxM', 280.0);
+                    acceptedHoldPredDiffM = norm(acceptedRefHoldPos(:) - acceptedPredPos(:));
+                    if isfinite(holdPredDiffMaxM) && holdPredDiffMaxM > 0 && ...
+                            isfinite(acceptedHoldPredDiffM) && acceptedHoldPredDiffM > holdPredDiffMaxM
+                        acceptedRefHoldOk = false;
+                    end
+                end
+                if acceptedRefHoldOk && trustedAnchorValid && all(isfinite(trustedAnchorHoldPos)) && ...
+                        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorTailEnable', 1) ~= 0
+                    preferTrustedStartSec = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorStartSec', ...
+                        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailStartSec', 320.0));
+                    preferTailNow = isfinite(preferTrustedStartSec) && epochElapsedSec >= preferTrustedStartSec;
+                    trustedPriorityMin = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorMinPriority', 40);
+                    trustedTailMaxDiffM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferTrustedAnchorMaxDiffM', 220.0);
+                    trustedPriorityNow = localDs5AnchorSourcePriority(trustedAnchorSource);
+                    acceptedTrustedDiffM = norm(acceptedRefHoldPos(:) - trustedAnchorHoldPos(:));
+                    if preferTailNow && trustedPriorityNow >= trustedPriorityMin && ...
+                            isfinite(acceptedTrustedDiffM) && acceptedTrustedDiffM > trustedTailMaxDiffM
+                        acceptedRefHoldOk = false;
+                    end
+                end
+            end
+            if recentFilterHoldOk
+                refObsHoldPos = recentFilterHoldPos(:);
+                refObsAnchorSource = 4;
+                refObsHoldVel = recentFilterHoldVel(:);
+            elseif acceptedRefHoldOk
+                refObsHoldPos = acceptedRefHoldPos(:);
+                refObsAnchorSource = 5;
+                refObsHoldVel = acceptedRefHoldVel(:);
+            elseif trustedAnchorValid && all(isfinite(trustedAnchorPos))
+                refObsHoldPos = trustedAnchorHoldPos(:);
+                refObsAnchorSource = 2;
+                if all(isfinite(trustedAnchorVel)) && isfinite(trustedAnchorTimeSec)
+                    refObsHoldVel = trustedAnchorVel(:);
+                end
+            elseif localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPreferAbsAnchor', 0) ~= 0 && ...
+                    all(isfinite(ds5AbsAnchorCurrPos))
+                refObsHoldPos = ds5AbsAnchorCurrPos(:);
+                refObsAnchorSource = 6;
+                if all(isfinite(ds5AbsAnchorCurrVel))
+                    refObsHoldVel = ds5AbsAnchorCurrVel(:);
                 end
             elseif all(isfinite(shadowClosedLoopLastPos)) && isfinite(shadowClosedLoopLastEpoch)
                 coastDt = (currMeasNr - shadowClosedLoopLastEpoch) * settings.navSolPeriod / 1000;
@@ -4146,16 +4540,6 @@ for currMeasNr = 1 : roundTime
                 if settings.deepShadowClosedLoopUseVelocityCoast && all(isfinite(shadowClosedLoopLastVel))
                     refObsHoldPos = refObsHoldPos + coastDt * shadowClosedLoopLastVel(:);
                     refObsHoldVel = shadowClosedLoopLastVel(:);
-                end
-            elseif trustedAnchorValid && all(isfinite(trustedAnchorPos))
-                refObsHoldPos = trustedAnchorPos(:);
-                refObsAnchorSource = 2;
-                if all(isfinite(trustedAnchorVel)) && isfinite(trustedAnchorTimeSec)
-                    trustedDt = epochElapsedSec - trustedAnchorTimeSec;
-                    if isfinite(trustedDt) && trustedDt >= 0
-                        refObsHoldPos = trustedAnchorPos(:) + trustedDt * trustedAnchorVel(:);
-                    end
-                    refObsHoldVel = trustedAnchorVel(:);
                 end
             elseif baselineOutputValid && all(isfinite(baselineOutputPos))
                 refObsHoldPos = baselineOutputPos(:);
@@ -4252,6 +4636,51 @@ for currMeasNr = 1 : roundTime
             navResults.shadowDs5RefObsPosAbsAnchorSoftPass(1, currMeasNr) = refObsAbsAnchorSoftPass;
             navResults.shadowDs5RefObsPosAbsAnchorGatePass(1, currMeasNr) = refObsAbsAnchorGatePass;
             if all(isfinite(refObsPos))
+                if refObsPosUsedNow && localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshOnRefObsAccept', 1) ~= 0
+                    refObsAbsRefreshMaxM = localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshMaxRefObsDiffM', 350.0);
+                    refObsAbsRefreshOk = ~isfinite(refObsAbsRefreshMaxM) || refObsAbsRefreshMaxM <= 0 || ...
+                        ~isfinite(refObsAbsAnchorDiffM) || refObsAbsAnchorDiffM <= refObsAbsRefreshMaxM;
+                    if refObsAbsRefreshOk && localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAbsAnchorAllowRefObsFallback', 0) == 0 && ...
+                            ds5RecoveredAbsAnchorValid && localDs5AnchorSourcePriority(ds5RecoveredAbsAnchorSource) >= localDs5AnchorSourcePriority(5)
+                        refObsAbsRefreshOk = false;
+                    end
+                    if refObsAbsRefreshOk && localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshSelfHeldEnable', 0) == 0 && ...
+                            any(refObsAnchorSource == [4, 5])
+                        refObsAbsRefreshOk = false;
+                        trustedRefreshPos = nan(3,1);
+                        if trustedAnchorValid && all(isfinite(trustedAnchorPos))
+                            trustedRefreshPos = trustedAnchorPos(:);
+                            if all(isfinite(trustedAnchorVel)) && isfinite(trustedAnchorTimeSec)
+                                trustedRefreshDt = epochElapsedSec - trustedAnchorTimeSec;
+                                if isfinite(trustedRefreshDt) && trustedRefreshDt >= 0
+                                    trustedRefreshPos = trustedAnchorPos(:) + trustedRefreshDt * trustedAnchorVel(:);
+                                end
+                            end
+                        end
+                        if all(isfinite(trustedRefreshPos))
+                            trustedRefreshMaxM = localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAbsAnchorRefreshTrustedMaxDiffM', 350.0);
+                            trustedRefreshDiffM = norm(refObsPos(:) - trustedRefreshPos(:));
+                            refObsAbsRefreshOk = ~isfinite(trustedRefreshMaxM) || trustedRefreshMaxM <= 0 || ...
+                                (isfinite(trustedRefreshDiffM) && trustedRefreshDiffM <= trustedRefreshMaxM);
+                        end
+                    end
+                    if refObsAbsRefreshOk
+                        ds5RecoveredAbsAnchorPos = refObsPos(:);
+                        if all(isfinite(refObsHoldVel))
+                            ds5RecoveredAbsAnchorVel = refObsHoldVel(:);
+                        else
+                            ds5RecoveredAbsAnchorVel = nan(3,1);
+                        end
+                        ds5RecoveredAbsAnchorEpoch = currMeasNr;
+                        ds5RecoveredAbsAnchorTimeSec = epochElapsedSec;
+                        ds5RecoveredAbsAnchorValid = true;
+                        ds5RecoveredAbsAnchorSource = 20;
+                        ds5RecoveredAbsAnchorFrozen = false;
+                        ds5AbsAnchorCurrPos = ds5RecoveredAbsAnchorPos(:);
+                        ds5AbsAnchorCurrVel = ds5RecoveredAbsAnchorVel(:);
+                        ds5AbsAnchorCurrAgeEpochs = 0;
+                    end
+                end
                 closedLoopPos = refObsPos(:);
                 if refObsPosUsedNow
                     closedLoopSource = 6;
@@ -4674,6 +5103,10 @@ for currMeasNr = 1 : roundTime
                 end
                 if localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterClockEnable', 1) ~= 0 && refObsPosUsedNow && isfinite(refObsClockM)
                     clockAlpha = max(0, min(1, localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterClockUpdateAlpha', 0.85)));
+                    refObsClockM = localRebaseDs5CommonClockBranch(refObsClockM, localGetDs5ClockPriorM(navResults, currMeasNr, predClockM), settings);
+                    if isfinite(predClockM)
+                        predClockM = localRebaseDs5CommonClockBranch(predClockM, localGetDs5ClockPriorM(navResults, currMeasNr, predClockM), settings);
+                    end
                     if recoveredFilterClockResetNow
                         shadowRecoveredFilterClockM = refObsClockM;
                     elseif isfinite(predClockM) && filterHasState
@@ -4681,6 +5114,8 @@ for currMeasNr = 1 : roundTime
                     else
                         shadowRecoveredFilterClockM = refObsClockM;
                     end
+                    shadowRecoveredFilterClockM = localRebaseDs5CommonClockBranch( ...
+                        shadowRecoveredFilterClockM, localGetDs5ClockPriorM(navResults, currMeasNr, shadowRecoveredFilterClockM), settings);
                     if recoveredFilterClockResetNow
                         shadowRecoveredFilterClockRateMps = 0;
                     elseif isfinite(oldClockM) && isfinite(oldFilterEpoch)
@@ -4758,6 +5193,15 @@ for currMeasNr = 1 : roundTime
         maxCoastEpochs = localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterMaxCoastEpochs', 80);
         maxBadEpochs = localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterMaxBadEpochs', 24);
         confirmEpochs = localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterConfirmEpochs', 3);
+        if localIsDs5Scenario(settings) && localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAuthorityWarmStartEnable', 1) ~= 0
+            recoveryStartSecAuth = localGetSettingValue(settings, 'deepShadowDs5RefObsRecoveryStartSec', 92.0);
+            navSolPeriodSecAuth = localGetSettingValue(settings, 'navSolPeriod', 500.0) / 1000.0;
+            recoveryStartEpochAuth = max(1, ceil(max(0, recoveryStartSecAuth - 1e-9) / max(navSolPeriodSecAuth, eps)) + 1);
+            warmStartEpochs = max(0, round(localGetSettingValue(settings, 'deepShadowDs5RecoveredFilterAuthorityWarmStartEpochs', 2)));
+            if currMeasNr >= recoveryStartEpochAuth && currMeasNr < (recoveryStartEpochAuth + warmStartEpochs)
+                confirmEpochs = 1;
+            end
+        end
         filterValidNow = all(isfinite(shadowRecoveredFilterPos)) && isfinite(shadowRecoveredFilterEpoch) && ...
             isfinite(shadowRecoveredFilterCoastAge) && shadowRecoveredFilterCoastAge <= maxCoastEpochs;
         recoveredFilterFilterValidPassNow = filterValidNow;
@@ -6342,7 +6786,7 @@ if allowTrustedAnchor
         priors(end).source = 20 + trustedSource;  % velocity propagation
     end
 end
-if isempty(priors) || settings.deepShadowTrustedAnchorAllowCurrentFallback
+if isempty(priors) && settings.deepShadowTrustedAnchorAllowCurrentFallback
     priors(end+1).pos = currentPos(:); %#ok<AGROW>
     priors(end).source = 1;
 end
@@ -8047,7 +8491,73 @@ nSat = numel(obs);
 if size(satPos,2) ~= nSat || nSat < 4
     return;
 end
-posEcef = refPos;
+initPosList = refPos(:);
+if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalMultiStartEnable', 1) ~= 0 && all(isfinite(absAnchorPos))
+    blendFractions = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalInitBlendFractions', [0 0.25 0.5 0.75 1.0]);
+    if isempty(blendFractions)
+        blendFractions = [0 1];
+    end
+    for bb = 1:numel(blendFractions)
+        alpha = blendFractions(bb);
+        if ~isfinite(alpha)
+            continue;
+        end
+        alpha = max(0, min(1, alpha));
+        initPosList(:, end+1) = (1 - alpha) * refPos(:) + alpha * absAnchorPos(:); %#ok<AGROW>
+    end
+end
+initPosList = localUniqueFiniteColumnVectors(initPosList);
+bestScore = inf;
+bestMeta = struct('rmsM', inf, 'corrNormM', inf, 'absAnchorDiffM', inf, ...
+    'initBiasM', inf, 'pdop', inf, 'score', inf);
+for ii = 1:size(initPosList, 2)
+    initPos = initPosList(:, ii);
+    [candPos, candRes, candPdop, candCorrNorm] = localSolveDs5RefObsLocalCorrectionSingle( ...
+        satPos, obs, refPos(:), initPos(:), clockPriorM, absAnchorPos, settings);
+    if ~all(isfinite(candPos(1:4))) || ~isfinite(candPdop) || ~isfinite(candCorrNorm)
+        continue;
+    end
+    finiteRes = isfinite(candRes);
+    if sum(finiteRes) < 4
+        continue;
+    end
+    candRmsM = sqrt(mean(candRes(finiteRes).^2, 'omitnan'));
+    if ~isfinite(candRmsM)
+        continue;
+    end
+    candAbsAnchorDiffM = nan;
+    if all(isfinite(absAnchorPos))
+        candAbsAnchorDiffM = norm(candPos(1:3) - absAnchorPos(:));
+    end
+    initBiasM = norm(initPos(:) - refPos(:));
+    candMeta = struct();
+    candMeta.rmsM = candRmsM;
+    candMeta.corrNormM = candCorrNorm;
+    candMeta.absAnchorDiffM = localFiniteOrZero(candAbsAnchorDiffM);
+    candMeta.initBiasM = initBiasM;
+    candMeta.pdop = candPdop;
+    candMeta.score = candRmsM + ...
+        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateCorrWeight', 0.08) * candCorrNorm + ...
+        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateAbsWeight', 0.12) * localFiniteOrZero(candAbsAnchorDiffM) + ...
+        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateInitBiasWeight', 0.02) * initBiasM;
+    if localIsDs5RefObsLocalCandidateBetter(candMeta, bestMeta, settings)
+        bestScore = candMeta.score;
+        bestMeta = candMeta;
+        pos = candPos;
+        res = candRes;
+        pdop = candPdop;
+        corrNorm = candCorrNorm;
+    end
+end
+end
+
+function [pos, res, pdop, corrNorm] = localSolveDs5RefObsLocalCorrectionSingle(satPos, obs, refPos, initPos, clockPriorM, absAnchorPos, settings)
+pos = nan(4,1);
+res = nan(numel(obs), 1);
+pdop = nan;
+corrNorm = nan;
+posEcef = initPos(:);
+nSat = numel(obs);
 maxIter = max(1, round(localGetSettingValue(settings, 'deepShadowDs5BranchLocalIterMax', 3)));
 stepMaxM = localGetSettingValue(settings, 'deepShadowDs5BranchLocalStepMaxM', 250.0);
 corrMaxM = localGetSettingValue(settings, 'deepShadowDs5BranchLocalCorrectionMaxM', 1200.0);
@@ -8126,6 +8636,219 @@ if all(isfinite(diag(Q)))
 end
 pos = [posEcef; clockBias];
 corrNorm = norm(posEcef - refPos);
+end
+
+function cols = localUniqueFiniteColumnVectors(cols)
+if isempty(cols)
+    return;
+end
+keep = false(1, size(cols, 2));
+uniq = nan(size(cols, 1), 0);
+tolM = 1e-3;
+for ii = 1:size(cols, 2)
+    col = cols(:, ii);
+    if ~all(isfinite(col))
+        continue;
+    end
+    isDup = false;
+    for jj = 1:size(uniq, 2)
+        if norm(col - uniq(:, jj)) <= tolM
+            isDup = true;
+            break;
+        end
+    end
+    if ~isDup
+        uniq(:, end+1) = col; %#ok<AGROW>
+        keep(ii) = true;
+    end
+end
+cols = cols(:, keep);
+if isempty(cols)
+    cols = nan(3,0);
+end
+end
+
+function val = localFiniteOrZero(x)
+if isfinite(x)
+    val = x;
+else
+    val = 0;
+end
+end
+
+function val = localFiniteOrInf(x)
+if isfinite(x)
+    val = x;
+else
+    val = inf;
+end
+end
+
+function tf = localIsDs5RefObsLocalCandidateBetter(candMeta, bestMeta, settings)
+tf = false;
+if ~isfinite(candMeta.rmsM)
+    return;
+end
+if ~isfinite(bestMeta.rmsM)
+    tf = true;
+    return;
+end
+goodRmsMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateGoodRmsMaxM', 5.0);
+rmsTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateRmsTieM', 1.0);
+corrTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateCorrTieM', 20.0);
+absTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateAbsTieM', 20.0);
+initTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidateInitTieM', 10.0);
+pdopTie = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionLocalCandidatePdopTie', 0.25);
+candGood = candMeta.rmsM <= goodRmsMaxM;
+bestGood = bestMeta.rmsM <= goodRmsMaxM;
+if candGood && bestGood
+    if candMeta.corrNormM < (bestMeta.corrNormM - corrTieM)
+        tf = true;
+        return;
+    end
+    if abs(candMeta.corrNormM - bestMeta.corrNormM) <= corrTieM
+        if candMeta.absAnchorDiffM < (bestMeta.absAnchorDiffM - absTieM)
+            tf = true;
+            return;
+        end
+        if abs(candMeta.absAnchorDiffM - bestMeta.absAnchorDiffM) <= absTieM
+            if candMeta.initBiasM < (bestMeta.initBiasM - initTieM)
+                tf = true;
+                return;
+            end
+            if abs(candMeta.initBiasM - bestMeta.initBiasM) <= initTieM
+                if candMeta.pdop < (bestMeta.pdop - pdopTie)
+                    tf = true;
+                    return;
+                end
+                if abs(candMeta.pdop - bestMeta.pdop) <= pdopTie && candMeta.score < bestMeta.score
+                    tf = true;
+                    return;
+                end
+            end
+        end
+    end
+end
+if candMeta.rmsM < (bestMeta.rmsM - rmsTieM)
+    tf = true;
+    return;
+end
+if abs(candMeta.rmsM - bestMeta.rmsM) <= rmsTieM
+    if candMeta.corrNormM < (bestMeta.corrNormM - corrTieM)
+        tf = true;
+        return;
+    end
+    if abs(candMeta.corrNormM - bestMeta.corrNormM) <= corrTieM
+        if candMeta.absAnchorDiffM < (bestMeta.absAnchorDiffM - absTieM)
+            tf = true;
+            return;
+        end
+        if abs(candMeta.absAnchorDiffM - bestMeta.absAnchorDiffM) <= absTieM
+            if candMeta.initBiasM < (bestMeta.initBiasM - initTieM)
+                tf = true;
+                return;
+            end
+            if abs(candMeta.initBiasM - bestMeta.initBiasM) <= initTieM
+                if candMeta.pdop < (bestMeta.pdop - pdopTie)
+                    tf = true;
+                    return;
+                end
+                if abs(candMeta.pdop - bestMeta.pdop) <= pdopTie && candMeta.score < bestMeta.score
+                    tf = true;
+                end
+            end
+        end
+    end
+end
+end
+
+function tf = localIsDs5RefObsSubsetCandidateBetter(candMeta, bestMeta, tailSubsetMode, settings)
+tf = false;
+if ~isfinite(candMeta.rmsM)
+    return;
+end
+if ~isfinite(bestMeta.rmsM)
+    tf = true;
+    return;
+end
+goodRmsMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetGoodRmsMaxM', 5.0);
+if tailSubsetMode
+    goodRmsMaxM = min(goodRmsMaxM, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetRmsGoodMaxM', 5.0));
+end
+rmsTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetRmsTieM', 2.0);
+corrTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetCorrTieM', 40.0);
+absTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetAbsTieM', 40.0);
+clockTieM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetClockTieM', 80.0);
+pdopTie = 0.5;
+candGood = candMeta.rmsM <= goodRmsMaxM;
+bestGood = bestMeta.rmsM <= goodRmsMaxM;
+if candGood && bestGood
+    if candMeta.corrM < (bestMeta.corrM - corrTieM)
+        tf = true;
+        return;
+    end
+    if abs(candMeta.corrM - bestMeta.corrM) <= corrTieM
+        if candMeta.absAnchorDiffM < (bestMeta.absAnchorDiffM - absTieM)
+            tf = true;
+            return;
+        end
+        if abs(candMeta.absAnchorDiffM - bestMeta.absAnchorDiffM) <= absTieM
+            if candMeta.usedSat > bestMeta.usedSat
+                tf = true;
+                return;
+            end
+            if candMeta.usedSat == bestMeta.usedSat
+                if candMeta.pdop < (bestMeta.pdop - pdopTie)
+                    tf = true;
+                    return;
+                end
+                if abs(candMeta.pdop - bestMeta.pdop) <= pdopTie && candMeta.clockResidualM < (bestMeta.clockResidualM - clockTieM)
+                    tf = true;
+                    return;
+                end
+                if abs(candMeta.pdop - bestMeta.pdop) <= pdopTie && abs(candMeta.clockResidualM - bestMeta.clockResidualM) <= clockTieM && candMeta.score < bestMeta.score
+                    tf = true;
+                    return;
+                end
+            end
+        end
+    end
+end
+if candMeta.rmsM < (bestMeta.rmsM - rmsTieM)
+    tf = true;
+    return;
+end
+if abs(candMeta.rmsM - bestMeta.rmsM) <= rmsTieM
+    if candMeta.corrM < (bestMeta.corrM - corrTieM)
+        tf = true;
+        return;
+    end
+    if abs(candMeta.corrM - bestMeta.corrM) <= corrTieM
+        if candMeta.absAnchorDiffM < (bestMeta.absAnchorDiffM - absTieM)
+            tf = true;
+            return;
+        end
+        if abs(candMeta.absAnchorDiffM - bestMeta.absAnchorDiffM) <= absTieM
+            if candMeta.usedSat > bestMeta.usedSat
+                tf = true;
+                return;
+            end
+            if candMeta.usedSat == bestMeta.usedSat
+                if candMeta.pdop < (bestMeta.pdop - pdopTie)
+                    tf = true;
+                    return;
+                end
+                if abs(candMeta.pdop - bestMeta.pdop) <= pdopTie && candMeta.clockResidualM < (bestMeta.clockResidualM - clockTieM)
+                    tf = true;
+                    return;
+                end
+                if abs(candMeta.pdop - bestMeta.pdop) <= pdopTie && abs(candMeta.clockResidualM - bestMeta.clockResidualM) <= clockTieM && candMeta.score < bestMeta.score
+                    tf = true;
+                end
+            end
+        end
+    end
+end
 end
 
 function [velOut, ok, satNum, rmsMps, p95Mps, signChoice, sourceId] = localEstimateDs5RecoveredDopplerVelocity(currMeasNr, navResults, posEcef, priorVel, settings)
@@ -8283,6 +9006,9 @@ good = isfinite(deltaUse);
 if ~any(good)
     return;
 end
+if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockRebaseEachDelta', 1) ~= 0
+    deltaUse = localRebaseDs5ClockVectorToPrior(deltaUse, clockPriorM, settings);
+end
 commonClockEnable = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockEnable', 1) ~= 0;
 if ~commonClockEnable
     commonClockRawM = median(deltaUse(good), 'omitnan');
@@ -8361,11 +9087,7 @@ end
 
 function clockPriorM = localGetDs5ClockPriorM(navResults, currMeasNr, fallbackClockM)
 clockPriorM = nan;
-if nargin >= 3 && isfinite(fallbackClockM)
-    clockPriorM = fallbackClockM;
-    return;
-end
-fields = {'shadowRecoveredFilterClockM', 'dt'};
+fields = {'dt', 'shadowRecoveredFilterClockM'};
 for ff = 1:numel(fields)
     fieldName = fields{ff};
     if ~isfield(navResults, fieldName)
@@ -8387,6 +9109,9 @@ for ff = 1:numel(fields)
         return;
     end
 end
+if nargin >= 3 && isfinite(fallbackClockM)
+    clockPriorM = fallbackClockM;
+end
 end
 
 function commonClockM = localRebaseDs5CommonClockBranch(commonClockM, clockPriorM, settings)
@@ -8398,9 +9123,96 @@ periodM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClock
 if ~isfinite(periodM) || periodM <= 0
     return;
 end
-branch = round((commonClockM - clockPriorM) / periodM);
-if isfinite(branch)
-    commonClockM = commonClockM - branch * periodM;
+commonClockM = localRebaseDs5ClockScalarToPrior(commonClockM, clockPriorM, periodM, settings);
+end
+
+function clockVec = localRebaseDs5ClockVectorToPrior(clockVec, clockPriorM, settings)
+if isempty(clockVec) || ~isfinite(clockPriorM) || ...
+        localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockRebaseEnable', 1) == 0
+    return;
+end
+periodM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockRebasePeriodM', settings.c * 1e-3);
+if ~isfinite(periodM) || periodM <= 0
+    return;
+end
+rawClockVec = clockVec;
+good = isfinite(rawClockVec);
+if ~any(good)
+    return;
+end
+clockVec = localRebaseDs5ClockVectorToCenter(rawClockVec, clockPriorM, periodM);
+bestScore = localDs5ClockVectorSpreadScore(clockVec(good));
+centers = [clockPriorM; clockVec(good); median(clockVec(good), 'omitnan')];
+centers = centers(isfinite(centers));
+for ii = 1:numel(centers)
+    cand = localRebaseDs5ClockVectorToCenter(rawClockVec, centers(ii), periodM);
+    score = localDs5ClockVectorSpreadScore(cand(good));
+    if score < bestScore
+        bestScore = score;
+        clockVec = cand;
+    end
+end
+end
+
+function clockOut = localRebaseDs5ClockScalarToPrior(clockIn, clockPriorM, periodM, settings)
+clockOut = clockIn;
+if ~isfinite(clockOut) || ~isfinite(clockPriorM) || ~isfinite(periodM) || periodM <= 0
+    return;
+end
+halfShifts = 0;
+if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockHalfPeriodRebaseEnable', 1) ~= 0
+    halfShifts = [0; 0.5 * periodM; -0.5 * periodM];
+end
+bestAbs = inf;
+for ii = 1:numel(halfShifts)
+    cand0 = clockIn + halfShifts(ii);
+    cand = cand0 - round((cand0 - clockPriorM) / periodM) * periodM;
+    candAbs = abs(cand - clockPriorM);
+    if isfinite(candAbs) && candAbs < bestAbs
+        bestAbs = candAbs;
+        clockOut = cand;
+    end
+end
+end
+
+function clockVec = localRebaseDs5ClockVectorToCenter(clockVec, centerM, periodM)
+good = isfinite(clockVec);
+if ~any(good)
+    return;
+end
+raw = clockVec(good);
+clockVec(good) = localRebaseDs5ClockScalarArrayToCenter(raw, centerM, periodM);
+end
+
+function score = localDs5ClockVectorSpreadScore(clockVec)
+clockVec = clockVec(:);
+clockVec = clockVec(isfinite(clockVec));
+if isempty(clockVec)
+    score = inf;
+    return;
+end
+dev = abs(clockVec - median(clockVec, 'omitnan'));
+if numel(dev) >= 2
+    score = prctile(dev, 95);
+else
+    score = 0;
+end
+end
+
+function clockVec = localRebaseDs5ClockScalarArrayToCenter(clockVec, centerM, periodM)
+rawClockVec = clockVec;
+bestScore = inf;
+halfShifts = [0, 0.5 * periodM, -0.5 * periodM];
+for ii = 1:numel(halfShifts)
+    cand0 = rawClockVec + halfShifts(ii);
+    branch = round((cand0 - centerM) ./ periodM);
+    cand = cand0 - branch .* periodM;
+    score = localDs5ClockVectorSpreadScore(cand);
+    score = score + 0.01 * abs(median(cand, 'omitnan') - centerM);
+    if isfinite(score) && score < bestScore
+        bestScore = score;
+        clockVec = cand;
+    end
 end
 end
 
@@ -8701,10 +9513,16 @@ if consistencyEnable
 else
     deltaConsistencyPass = true;
 end
-[pos, res, pdop, corrM, usedSat, keepMask, commonClockM] = localSolveDs5RefObsBestSubset(satUseAll, deltaUseAll, anchorPos(:), absAnchorPos(:), clockPriorM, prnAll(:), badScoreByPrn, minSat, settings);
+[pos, res, pdop, corrM, usedSat, keepMask, commonClockM] = localSolveDs5RefObsBestSubset(satUseAll, deltaUseAll, anchorPos(:), absAnchorPos(:), clockPriorM, prnAll(:), badScoreByPrn, minSat, currMeasNr, settings);
 if numel(keepMask) == numel(validIdx)
-    robustKeepAll(validIdx(keepMask)) = true;
-    residualAll(validIdx(keepMask)) = res(:);
+    keepMask = logical(keepMask(:));
+    robustKeepIdx = validIdx(keepMask);
+    robustKeepAll(robustKeepIdx) = true;
+    if numel(res) == numel(robustKeepIdx)
+        residualAll(robustKeepIdx) = res(:);
+    else
+        residualAll(robustKeepIdx) = nan;
+    end
 end
 if numel(prnAll) == numel(validIdx)
     [badScoreByPrn, badScoreUsed] = localUpdateDs5RefObsBadScores(prnAll(:), keepMask(:), res(:), badScoreByPrn, settings);
@@ -8719,6 +9537,12 @@ if isfinite(outCommonClockM) && isfinite(outClockResidualM)
     outClockM = outCommonClockM + outClockResidualM;
 elseif isfinite(outClockResidualM)
     outClockM = outClockResidualM;
+end
+if isfinite(outClockM)
+    outClockM = localRebaseDs5CommonClockBranch(outClockM, clockPriorM, settings);
+    if isfinite(outCommonClockM)
+        outClockResidualM = outClockM - outCommonClockM;
+    end
 end
 postfitRmsM = sqrt(mean(res(isfinite(res)).^2, 'omitnan'));
 if ~isfinite(postfitRmsM)
@@ -8779,6 +9603,26 @@ pdopMax = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPdopMax', 2
 corrMax = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCorrMaxM', 260.0);
 anchorDiffMax = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionAnchorDiffMaxM', corrMax);
 jumpMax = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionJumpMaxM', 220.0);
+bootstrapEpochs = max(0, round(localGetSettingValue(settings, 'deepShadowDs5RefObsPositionBootstrapEpochs', 40)));
+if bootstrapEpochs > 0
+    navSolPeriodSec = localGetSettingValue(settings, 'navSolPeriod', 500.0) / 1000.0;
+    recoveryStartSec = localGetSettingValue(settings, 'deepShadowDs5RefObsRecoveryStartSec', 92.0);
+    recoveryStartEpoch = max(1, ceil(max(0, recoveryStartSec - 1e-9) / max(navSolPeriodSec, eps)) + 1);
+    if currMeasNr >= recoveryStartEpoch && currMeasNr < (recoveryStartEpoch + bootstrapEpochs)
+        corrMax = max(corrMax, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionBootstrapCorrMaxM', 700.0));
+        anchorDiffMax = max(anchorDiffMax, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionBootstrapAnchorDiffMaxM', 700.0));
+        jumpMax = max(jumpMax, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionBootstrapJumpMaxM', 900.0));
+    end
+end
+tailStartSec = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailStartSec', 320.0);
+navSolPeriodSec = localGetSettingValue(settings, 'navSolPeriod', 500.0) / 1000.0;
+epochSecNow = max(0, currMeasNr - 1) * navSolPeriodSec;
+if isfinite(tailStartSec) && epochSecNow >= tailStartSec
+    corrMax = max(corrMax, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailCorrMaxM', 650.0));
+    anchorDiffMax = max(anchorDiffMax, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailAnchorDiffMaxM', 650.0));
+    jumpMax = max(jumpMax, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailJumpMaxM', 800.0));
+    predSupportVelDiffMax = max(predSupportVelDiffMax, localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailPredVelDiffMaxMps', 260.0));
+end
 jumpGatePass = ~isfinite(jumpM) || ~isfinite(jumpMax) || jumpM <= jumpMax;
 predSupportPass = anchorDiffM <= predSupportAnchorMax && postfitRmsM <= predSupportPostfitMax;
 if predSupportPass && isfinite(predVelDiffMps)
@@ -8822,13 +9666,58 @@ end
 dynGatePass = jumpGatePass && speedGatePass && accelGatePass;
 useAbsAnchorHardGate = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionAbsAnchorUseHardGate', 0) ~= 0;
 absAnchorAcceptPass = ~useAbsAnchorHardGate || absAnchorGatePass;
-if postfitRmsM <= postfitMax && pdop <= pdopMax && corrM <= corrMax && ...
-        anchorDiffM <= anchorDiffMax && absAnchorAcceptPass && jumpGatePass && dynGatePass
+escapeAcceptPass = false;
+if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapeEnable', 1) ~= 0
+    staleAgeEpochs = max(0, round(localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapeStaleAgeEpochs', 8)));
+    holdIsStale = ~isfinite(prevAcceptedEpoch) || (currMeasNr - prevAcceptedEpoch) >= staleAgeEpochs;
+    escapeMinSat = max(minSat, round(localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapeMinSat', 5)));
+    escapePostfitMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapePostfitMaxM', 40.0);
+    escapeDeltaSpreadP95MaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapeDeltaSpreadP95MaxM', 250.0);
+    escapeCorrMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapeCorrMaxM', max(corrMax, 900.0));
+    escapeAnchorDiffMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapeAnchorDiffMaxM', max(anchorDiffMax, 900.0));
+    escapeJumpMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapeJumpMaxM', max(jumpMax, 1200.0));
+    escapePredVelDiffMaxMps = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionEscapePredVelDiffMaxMps', 250.0);
+    escapeQualityPass = usedSat >= escapeMinSat && deltaConsistencyPass && ...
+        isfinite(deltaSpreadP95M) && deltaSpreadP95M <= escapeDeltaSpreadP95MaxM && ...
+        isfinite(postfitRmsM) && postfitRmsM <= escapePostfitMaxM && ...
+        isfinite(pdop) && pdop <= pdopMax && ...
+        isfinite(corrM) && corrM <= escapeCorrMaxM && ...
+        isfinite(anchorDiffM) && anchorDiffM <= escapeAnchorDiffMaxM && ...
+        (~isfinite(jumpM) || jumpM <= escapeJumpMaxM) && ...
+        absAnchorAcceptPass;
+    if escapeQualityPass && isfinite(predVelDiffMps) && isfinite(escapePredVelDiffMaxMps) && escapePredVelDiffMaxMps > 0
+        escapeQualityPass = predVelDiffMps <= escapePredVelDiffMaxMps;
+    end
+    if escapeQualityPass && holdIsStale
+        escapeAcceptPass = true;
+        dynGateMode = max(dynGateMode, 4);
+    end
+end
+highPdopEscapePass = false;
+if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeEnable', 1) ~= 0
+    highPdopEscapeMaxPdop = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeMaxPdop', 32.0);
+    highPdopEscapePostfitMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHighPdopEscapePostfitMaxM', 0.02);
+    highPdopEscapeCorrMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeCorrMaxM', 220.0);
+    highPdopEscapeAnchorDiffMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeAnchorDiffMaxM', 220.0);
+    highPdopEscapeJumpMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionHighPdopEscapeJumpMaxM', 260.0);
+    highPdopEscapePass = deltaConsistencyPass && usedSat >= minSat && absAnchorAcceptPass && ...
+        isfinite(pdop) && isfinite(highPdopEscapeMaxPdop) && highPdopEscapeMaxPdop > 0 && pdop <= highPdopEscapeMaxPdop && ...
+        isfinite(postfitRmsM) && postfitRmsM <= highPdopEscapePostfitMaxM && ...
+        isfinite(corrM) && corrM <= highPdopEscapeCorrMaxM && ...
+        isfinite(anchorDiffM) && anchorDiffM <= highPdopEscapeAnchorDiffMaxM && ...
+        (~isfinite(jumpM) || jumpM <= highPdopEscapeJumpMaxM) && ...
+        jumpGatePass && dynGatePass;
+    if highPdopEscapePass
+        dynGateMode = max(dynGateMode, 5);
+    end
+end
+if (postfitRmsM <= postfitMax && pdop <= pdopMax && corrM <= corrMax && ...
+        anchorDiffM <= anchorDiffMax && absAnchorAcceptPass && jumpGatePass && dynGatePass) || escapeAcceptPass || highPdopEscapePass
     ok = true;
     outPos = pos(1:3);
 end
 end
-function [bestPos, bestRes, bestPdop, bestCorrM, bestUsedSat, bestKeepMask, bestCommonClockM] = localSolveDs5RefObsBestSubset(satUseAll, deltaUseAll, anchorPos, absAnchorPos, clockPriorM, prnUseAll, badScoreByPrn, minSat, settings)
+function [bestPos, bestRes, bestPdop, bestCorrM, bestUsedSat, bestKeepMask, bestCommonClockM] = localSolveDs5RefObsBestSubset(satUseAll, deltaUseAll, anchorPos, absAnchorPos, clockPriorM, prnUseAll, badScoreByPrn, minSat, currMeasNr, settings)
 bestPos = nan(4,1);
 bestRes = nan(numel(deltaUseAll), 1);
 bestPdop = nan;
@@ -8845,6 +9734,15 @@ if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustSubsetEnable
     maxDrop = min(max(0, round(localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustMaxDropSat', 2))), nSat - minSat);
 end
 bestScore = inf;
+bestMeta = struct('rmsM', inf, 'corrM', inf, 'absAnchorDiffM', inf, ...
+    'usedSat', 0, 'clockResidualM', inf, 'pdop', inf, 'score', inf);
+tailStartSec = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailStartSec', 320.0);
+tailSubsetMode = false;
+if nargin >= 9 && isfinite(currMeasNr)
+    navSolPeriodSec = localGetSettingValue(settings, 'navSolPeriod', 500.0) / 1000.0;
+    epochSecNow = max(0, currMeasNr - 1) * navSolPeriodSec;
+    tailSubsetMode = isfinite(tailStartSec) && epochSecNow >= tailStartSec;
+end
 hardDropEnable = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustHardDropEnable', 1) ~= 0;
 hardDropPrns = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustHardDropPrns', [21 27]);
 hardDropMinSatNum = max(minSat + 1, round(localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustHardDropMinSatNum', 5)));
@@ -8867,13 +9765,21 @@ for dropNum = 0:maxDrop
         if sum(keep) < minSat
             continue;
         end
+        hardDropTailRelax = tailSubsetMode && ...
+            localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustHardDropTailRelaxEnable', 1) ~= 0;
+        hardDropTargetPenaltyM = 0;
         if hardDropEnable && nSat >= hardDropMinSatNum && any(isHardDropTargetAll)
             keepTargetNum = sum(keep & isHardDropTargetAll);
             keepNonTargetNum = sum(keep & ~isHardDropTargetAll);
             minTargetNeeded = max(0, minSat - keepNonTargetNum);
             excessTargetKept = max(0, keepTargetNum - minTargetNeeded);
             if excessTargetKept > 0
-                continue;
+                if hardDropTailRelax
+                    hardDropTargetPenaltyM = localGetSettingValue(settings, ...
+                        'deepShadowDs5RefObsPositionRobustHardDropTailPenaltyM', 120.0) * excessTargetKept;
+                else
+                    continue;
+                end
             end
         end
         satUse = satUseAll(:, keep);
@@ -8894,15 +9800,74 @@ for dropNum = 0:maxDrop
         if ~isfinite(rmsM)
             continue;
         end
-        dropPenalty = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustDropPenaltyM', 20.0) * dropNum;
-        score = rmsM + 0.05 * corrM + dropPenalty;
+        absAnchorDiffM = nan;
         if all(isfinite(absAnchorPos))
             absAnchorDiffM = norm(pos(1:3) - absAnchorPos(:));
+        end
+        dropPenalty = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustDropPenaltyM', 20.0) * dropNum;
+        keepSatBonusM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustKeepSatBonusM', 18.0);
+        score = rmsM + 0.05 * corrM + dropPenalty + hardDropTargetPenaltyM - keepSatBonusM * max(0, sum(keep) - minSat);
+        if tailSubsetMode
+            tailCorrSoftMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetCorrSoftMaxM', 350.0);
+            tailCorrHardMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetCorrHardMaxM', 900.0);
+            tailCorrScoreWeightM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetCorrScoreWeightM', 240.0);
+            tailRmsGoodMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetRmsGoodMaxM', 5.0);
+            tailRmsGoodBonusM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetRmsGoodBonusM', 60.0);
+            if isfinite(corrM) && isfinite(tailCorrSoftMaxM) && isfinite(tailCorrHardMaxM) && ...
+                    tailCorrHardMaxM > tailCorrSoftMaxM && corrM > tailCorrSoftMaxM
+                score = score + tailCorrScoreWeightM * ...
+                    min(1, max(0, (corrM - tailCorrSoftMaxM) / max(tailCorrHardMaxM - tailCorrSoftMaxM, eps)));
+            end
+            if isfinite(rmsM) && isfinite(tailRmsGoodMaxM) && rmsM <= tailRmsGoodMaxM
+                score = score - tailRmsGoodBonusM;
+            end
+        end
+        if all(isfinite(absAnchorPos))
             absAnchorSoftMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionAbsAnchorSoftMaxDiffM', 900.0);
             absAnchorHardMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionAbsAnchorMaxDiffM', 1800.0);
             absAnchorScoreWeightM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionAbsAnchorScoreWeightM', 140.0);
             if isfinite(absAnchorDiffM) && isfinite(absAnchorSoftMaxM) && isfinite(absAnchorHardMaxM) && absAnchorHardMaxM > absAnchorSoftMaxM && absAnchorDiffM > absAnchorSoftMaxM
                 score = score + absAnchorScoreWeightM * min(1, max(0, (absAnchorDiffM - absAnchorSoftMaxM) / max(absAnchorHardMaxM - absAnchorSoftMaxM, eps)));
+            end
+            if tailSubsetMode
+                tailAbsSoftMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetAbsAnchorSoftMaxM', 220.0);
+                tailAbsHardMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetAbsAnchorHardMaxM', 900.0);
+                tailAbsScoreWeightM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetAbsAnchorScoreWeightM', 260.0);
+                if isfinite(absAnchorDiffM) && isfinite(tailAbsSoftMaxM) && isfinite(tailAbsHardMaxM) && ...
+                        tailAbsHardMaxM > tailAbsSoftMaxM && absAnchorDiffM > tailAbsSoftMaxM
+                    score = score + tailAbsScoreWeightM * ...
+                        min(1, max(0, (absAnchorDiffM - tailAbsSoftMaxM) / max(tailAbsHardMaxM - tailAbsSoftMaxM, eps)));
+                end
+            end
+        end
+        if tailSubsetMode
+            tailMinSatPenaltyM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailMinSatPenaltyM', 80.0);
+            tailMinSatFarAbsPenaltyM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailMinSatFarAbsPenaltyM', 420.0);
+            tailMinSatFarCorrPenaltyM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailMinSatFarCorrPenaltyM', 260.0);
+            if sum(keep) <= minSat
+                score = score + tailMinSatPenaltyM;
+                if isfinite(absAnchorDiffM) && absAnchorDiffM > localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetAbsAnchorSoftMaxM', 220.0)
+                    score = score + tailMinSatFarAbsPenaltyM;
+                end
+                if isfinite(corrM) && corrM > localGetSettingValue(settings, 'deepShadowDs5RefObsPositionTailSubsetCorrSoftMaxM', 350.0)
+                    score = score + tailMinSatFarCorrPenaltyM;
+                end
+            end
+        end
+        subsetPdopSoftMax = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetPdopSoftMax', 8.0);
+        subsetPdopHardMax = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetPdopHardMax', 24.0);
+        subsetPdopScoreWeightM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetPdopScoreWeightM', 80.0);
+        subsetPdopAcceptMax = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionPdopMax', 20.0);
+        if isfinite(pdop) && isfinite(subsetPdopSoftMax) && isfinite(subsetPdopHardMax) && subsetPdopHardMax > subsetPdopSoftMax && pdop > subsetPdopSoftMax
+            score = score + subsetPdopScoreWeightM * ...
+                min(1, max(0, (pdop - subsetPdopSoftMax) / max(subsetPdopHardMax - subsetPdopSoftMax, eps)));
+        end
+        subsetMinSatPenaltyM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetMinSatPenaltyM', 40.0);
+        subsetMinSatHighPdopPenaltyM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionSubsetMinSatHighPdopPenaltyM', 120.0);
+        if sum(keep) <= minSat
+            score = score + subsetMinSatPenaltyM;
+            if isfinite(pdop) && pdop > subsetPdopAcceptMax
+                score = score + subsetMinSatHighPdopPenaltyM;
             end
         end
         clockSoftMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionClockSoftMaxM', 1200.0);
@@ -8911,6 +9876,28 @@ for dropNum = 0:maxDrop
         clockAbsM = abs(pos(4));
         if isfinite(clockAbsM) && isfinite(clockSoftMaxM) && isfinite(clockHardMaxM) && clockHardMaxM > clockSoftMaxM && clockAbsM > clockSoftMaxM
             score = score + clockScoreWeightM * min(1, max(0, (clockAbsM - clockSoftMaxM) / max(clockHardMaxM - clockSoftMaxM, eps)));
+        end
+        commonClockSubsetResidualM = abs(clockResidualPriorM);
+        commonClockSubsetSoftMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockSubsetSoftMaxM', 1200.0);
+        commonClockSubsetHardMaxM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockSubsetHardMaxM', 3500.0);
+        commonClockSubsetScoreWeightM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockSubsetScoreWeightM', 140.0);
+        if isfinite(commonClockSubsetResidualM) && isfinite(commonClockSubsetSoftMaxM) && ...
+                isfinite(commonClockSubsetHardMaxM) && commonClockSubsetHardMaxM > commonClockSubsetSoftMaxM && ...
+                commonClockSubsetResidualM > commonClockSubsetSoftMaxM
+            score = score + commonClockSubsetScoreWeightM * ...
+                min(1, max(0, (commonClockSubsetResidualM - commonClockSubsetSoftMaxM) / ...
+                max(commonClockSubsetHardMaxM - commonClockSubsetSoftMaxM, eps)));
+        end
+        periodM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockRebasePeriodM', settings.c * 1e-3);
+        if localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockHalfPeriodRebaseEnable', 1) ~= 0 && ...
+                isfinite(commonClockM) && isfinite(clockPriorM) && isfinite(periodM) && periodM > 0
+            halfPeriodResidM = abs(abs(commonClockM - clockPriorM) - 0.5 * periodM);
+            halfPeriodGuardM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockHalfPeriodGuardM', 1500.0);
+            halfPeriodPenaltyM = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionCommonClockHalfPeriodPenaltyM', 220.0);
+            if isfinite(halfPeriodResidM) && isfinite(halfPeriodGuardM) && halfPeriodGuardM > 0 && ...
+                    halfPeriodResidM <= halfPeriodGuardM
+                score = score + halfPeriodPenaltyM * (1 - halfPeriodResidM / halfPeriodGuardM);
+            end
         end
         if numel(prnUseAll) == nSat && ~isempty(badScoreByPrn)
             badPrns = localGetSettingValue(settings, 'deepShadowDs5RefObsPositionRobustBadPrns', [27 9]);
@@ -8933,8 +9920,17 @@ for dropNum = 0:maxDrop
                     sum(ismember(keepPrnAll(:), hardDropPrns(:)));
             end
         end
-        if score < bestScore
+        candMeta = struct();
+        candMeta.rmsM = rmsM;
+        candMeta.corrM = corrM;
+        candMeta.absAnchorDiffM = localFiniteOrZero(absAnchorDiffM);
+        candMeta.usedSat = sum(keep);
+        candMeta.clockResidualM = localFiniteOrInf(commonClockSubsetResidualM);
+        candMeta.pdop = pdop;
+        candMeta.score = score;
+        if localIsDs5RefObsSubsetCandidateBetter(candMeta, bestMeta, tailSubsetMode, settings)
             bestScore = score;
+            bestMeta = candMeta;
             bestPos = pos;
             bestRes = res;
             bestPdop = pdop;
@@ -9352,6 +10348,14 @@ if recoveryValid
                 continuityDiffM = norm(closedLoopPos(:) - predPos);
                 continuityMaxM = localGetSettingValue(settings, 'deepShadowDs5FinalContinuityMaxPredDiffM', 60.0);
                 continuityPass = ~isfinite(continuityMaxM) || continuityMaxM <= 0 || continuityDiffM <= continuityMaxM;
+                recoveryStartSec = localGetSettingValue(settings, 'deepShadowDs5RefObsRecoveryStartSec', 92.0);
+                navSolPeriodSec = localGetSettingValue(settings, 'navSolPeriod', 500.0) / 1000.0;
+                recoveryStartEpoch = max(1, ceil(max(0, recoveryStartSec - 1e-9) / max(navSolPeriodSec, eps)) + 1);
+                continuityWarmStartEpochs = max(0, round(localGetSettingValue(settings, 'deepShadowDs5FinalContinuityWarmStartEpochs', 4)));
+                if currMeasNr >= recoveryStartEpoch && currMeasNr < (recoveryStartEpoch + continuityWarmStartEpochs)
+                    continuityDiffM = nan;
+                    continuityPass = true;
+                end
             end
         end
         if continuityPass || localGetSettingValue(settings, 'deepShadowDs5FinalContinuitySlewEnable', 1) ~= 0
@@ -9667,6 +10671,49 @@ if isfield(settings, 'fileName') && ~isempty(settings.fileName)
         tf = false;
         return;
     end
+end
+end
+
+function tf = localShouldReplaceDs5TrustedAnchor(currentValid, currentSource, candidateSource, settings)
+tf = false;
+if candidateSource <= 0
+    return;
+end
+if ~currentValid || currentSource <= 0
+    tf = true;
+    return;
+end
+if candidateSource == currentSource
+    tf = localGetSettingValue(settings, 'deepShadowTrustedAnchorRefreshSameSource', 1) ~= 0;
+    if tf && localGetSettingValue(settings, 'deepShadowTrustedAnchorRefreshOnlyS5', 0) ~= 0
+        tf = (candidateSource == 5);
+    end
+    return;
+end
+if localGetSettingValue(settings, 'deepShadowTrustedAnchorAllowHigherPriorityReplace', 1) == 0
+    return;
+end
+tf = localDs5AnchorSourcePriority(candidateSource) > localDs5AnchorSourcePriority(currentSource);
+end
+
+function priority = localDs5AnchorSourcePriority(source)
+switch source
+    case 2
+        priority = 50;  % truth/trj validation anchor
+    case 5
+        priority = 40;  % baseline aligned to INS
+    case 4
+        priority = 30;  % INS propagated/current INS anchor
+    case 1
+        priority = 20;  % online pre-spoof main-nav/INS anchor
+    case 3
+        priority = 10;  % baseline-fed fallback anchor
+    case 20
+        priority = 8;   % last accepted recovered observation fallback
+    case 10
+        priority = 5;   % baseline output fallback
+    otherwise
+        priority = 0;
 end
 end
 
